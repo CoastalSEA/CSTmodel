@@ -28,7 +28,7 @@ classdef CSTmodel < muiDataSet
 %--------------------------------------------------------------------------
 % Model implementation
 %--------------------------------------------------------------------------         
-        function obj = runModel(mobj)
+        function obj = runModel(mobj,varargin)
             %function to run a simple 2D diffusion model
             obj = CSTmodel;                           
             [dsp1,dsp2] = modelDSproperties(obj);
@@ -46,9 +46,15 @@ classdef CSTmodel < muiDataSet
 %--------------------------------------------------------------------------
 % Model code  <<INSERT MODEL CODE or CALL MODEL>>
 %--------------------------------------------------------------------------
-            inpobj = getClassObj(mobj,'Inputs','CSTparameters');
-            rnpobj = getClassObj(mobj,'Inputs','CSTrunparams');
-            estobj = getClassObj(mobj,'Inputs','CSTformprops');            
+            if isa(mobj,'CSTmodelUI')
+                %model called from CSTmodel UI interface
+                inpobj = getClassObj(mobj,'Inputs','CSTparameters');
+                rnpobj = getClassObj(mobj,'Inputs','CSTrunparams');
+                estobj = getClassObj(mobj,'Inputs','CSTformprops');  
+            else
+                %model called from external program (eg asmita)
+                
+            end
             [resX,resXT,mtime,xy] = cst_model(inpobj,rnpobj,estobj);
             %now assign results to object properties  
             modeltime = seconds(mtime{1});  %durataion data for rows 
