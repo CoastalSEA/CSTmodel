@@ -96,13 +96,13 @@ function [resX,resXT,time,xyz] = cst_model(inp,rnp,est)
         % compute default area, width and depth values
         A = Ar+(Ao-Ar)*exp(-x/LA); 
         B = Br+(Bo-Br)*exp(-x/Lb);
-        if length(Rs)==3
+        if length(Rs)==length(xsw)+2
             rs = interp1([0 xsw Le],Rs,x,'linear');
         elseif length(Rs)~=length(x)
             rs = ones(size(x))*Rs;
         end
         %
-        if length(kM)==3
+        if length(kM)~=length(x)
         	Ks = interp1([0 xsw Le],kM,x,'linear');
         elseif length(kM)~=length(x)
             Ks = ones(size(x))*kM;

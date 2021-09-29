@@ -26,8 +26,18 @@
 % * *Export/Import > Import*: user selects an exported Case class instance (mat file) to be loaded.
 
 %% Setup
-% * *Import Data*: dialogue to import data from a file.
-% * *Input Parameters*: dialogue to define model input parameters.
+% * *Model Parameters*: dialogue to define model input parameters.
+% * *Run Parameters*: dialogue to define model run time parameters.
+% * *Estuary Properties*: dailogue to load estuary form properties from a
+% file.
+
+%%
+%  File format - 1 line for header and 5 columns of data as follows:
+%  x, Amtl, Whw, Wlw, Manning_N(optional)
+%  Distance from mouth, Area at mean tide level, Width at high water, Width at low water, Mannings N
+
+%%
+% * *Import Data*: dialogue to import observed or model data from a file.
 % * *Model Constants*: a number of constants are used in the model. Generally, the default values are appropriate but these can be adjusted and saved with the project if required.
 
 %% Run
