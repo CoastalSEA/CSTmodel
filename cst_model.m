@@ -66,7 +66,7 @@ function [resX,resXT,time,xyz] = cst_model(inp,rnp,est)
 %     
 %     t = (0:1:tint)*(T)/(tint);
     xint = ceil(Le/dx); %ensure x is an exact number of intervals of delX
-    x = 0:dx:(xint*dx)';
+    x = 0:dx:(xint*dx);
     tint = ceil(T/dt);  %ensure t is an exact number of intervals of delT
     t = 0:dt:(tint*dt);
     ht = zeros(length(x),length(t)); 
