@@ -80,6 +80,12 @@ classdef CSTrunmodel < muiDataSet
             setDataSetRecord(obj,muicat,dst,'model');
             getdialog('Run complete');
         end
+%%
+        function obj = getCSTrunmodel()
+            %provide access to CSTrunmodel class instance
+            %used in CSTdataimport to access tab plotting functions
+            obj = CSTrunmodel;
+        end
     end
 %%
     methods
@@ -97,20 +103,19 @@ classdef CSTrunmodel < muiDataSet
             delete(ht);
             ax = axes('Parent',src,'Tag','Q-Plot');
 			yyaxis left
-            plot(x,z,'-r');             %plot time v elevation
+            plot(x,z,'-r''DisplayName','MTL'); %plot time v elevation
             hold on
-            plot(x,(z+a),'-.b')       %plot high water level
-            plot(x,(z-a),'-.b')       %plot low water level
-			plot(x,(z-d),'-k');       %hydraulic depth below mean tide level
+            plot(x,(z+a),'-.b','DisplayName','HWL')%plot high water level
+            plot(x,(z-a),'-.b','DisplayName','LWL')%plot low water level
+			plot(x,(z-d),'-k','DisplayName','Hydraulic depth')%hydraulic depth below mean tide level
             ylabel('Elevation (mOD)'); 
 			yyaxis right
-			plot(x,U,'--c')             %plot tidal velocity
-			plot(x,v,'--g')             %plot river velocity
+			plot(x,U,'--','Color',mcolor('orange'),'DisplayName','Tidal velocity')%plot tidal velocity
+			plot(x,v,'--','Color',mcolor('green'),'DisplayName','River velocity') %plot river velocity
             hold off
             xlabel('Distance from mouth (m)'); 
             ylabel('Velocity (m/s)'); 
-			legend('MTL','HWL','LWL','Hydraulic depth',...
-                'Tidal velocity','River velocity','Location','best');			
+			legend('Location','best');			
             title ('Along channel variation');
             ax.Color = [0.96,0.96,0.96];  %needs to be set after plot
         end
@@ -118,18 +123,176 @@ classdef CSTrunmodel < muiDataSet
         function xt_tabPlot(obj,src) 
             %generate plot for display on Q-Plot tab
             dst = obj.Data.TidalCycleValues;
+            if ~isprop(dst,'Elevation')
+                dst = activatedynamicprops(dst);
+            end
             x = dst.Dimensions.X; 
-            t = dst.RowNames;
+            t = dst.RowNames;            
+            plabels.y1 = dst.VariableLabels{1}; %plot labels
+            plabels.y2 = dst.VariableLabels{2};
+            
+            ptype = questdlg('Type of plot?','XT plot','X @ T','T @ X','X @ T');
+            if strcmp('X @ T',ptype)
+                xax = x;  %assign x-axis variable as x
+                svar = t; %slider selects t value to plot
+                plabels.x = dst.DimensionLabels{1};
+                plabels.title = 'Along-channel Variation at time, T';                
+                stxt = 'Time = ';
+            else
+                xax = t;  %assign x-axis variable as t
+                svar = x; %slider selects x value to plot
+                plabels.x = dst.TableRowName;
+                plabels.title = 'Time Variation at distance, X';
+                stxt = 'Distance = ';
+            end
+            
             ht = findobj(src,'Type','axes');
             delete(ht);
-            ax = axes('Parent',src,'Tag','Profile');
+            ax = axes('Parent',src,'Tag','PlotFigAxes');
+            ax.Position = [0.16,0.18,0.65,0.75]; %make space for slider bar
+            hm = setSlideControl(obj,src,ptype,svar,dst,stxt);
             
-            %create animation and add slider to allow user to scroll
+            pinput = getPlotInput(obj,dst,ptype,1);
+            setPlot(obj,ax,xax,pinput,plabels);
+            hp = setDataSources(obj,ax);
             
+            ax.YLimMode = 'manual';
+            setYaxisLimits(obj,ax,dst)
+            nint = length(svar);
+            if isdatetime(svar) || isduration(svar)
+                svar = time2num(svar);
+            end
+            Mframes(nint,1) = getframe(gcf);
+            Mframes(1,1) = getframe(gcf);
+            for i=2:nint
+                pinput = getPlotInput(obj,dst,ptype,i); %#ok<NASGU>
+                refreshdata(hp,'caller')                
+                hm(1).Value = svar(i);
+                hm(3).String = string(string(svar(i)));
+                drawnow;                 
+                Mframes(i,1) = getframe(gcf); %NB print function allows more control of resolution 
+            end
+            hold(ax,'off')
         end
     end 
 %%    
     methods (Access = private)
+        function pinput = getPlotInput(~,dst,ptype,jxt)
+            %get the variables for the selected x or t value
+            h = dst.Elevation;
+            U = dst.Velocity;
+            v = dst.RiverVel;
+            s = dst.StokesVel;
+            if strcmp('X @ T',ptype)
+                pinput.h = h(jxt,:);
+                pinput.U = U(jxt,:);
+                pinput.v = v(jxt,:);
+                pinput.s = s(jxt,:);
+            else
+                pinput.h = h(:,jxt);
+                pinput.U = U(:,jxt);
+                pinput.v = v(:,jxt);
+                pinput.s = s(:,jxt);
+            end            
+        end
+%%
+        function hp = setDataSources(~,ax)
+            %set the source variables to be used for each plot line
+            yyaxis 'left';
+            hpl = ax.Children;            
+            yyaxis 'right';
+            hpr = ax.Children;
+            hp = [hpr;hpl];
+            hp(4).YDataSource = 'pinput.h';
+            hp(3).YDataSource = 'pinput.U'; 
+            hp(2).YDataSource = 'pinput.v'; 
+            hp(1).YDataSource = 'pinput.s'; 
+        end
+%%
+        function setPlot(~,ax,xax,pin,plabels)
+            %generate the plot for selected subset of x-t data            
+            yyaxis left
+            plot(ax,xax,pin.h,'-b','DisplayName','Elevation');   
+            ylabel(plabels.y1)
+            yyaxis right
+            hold on
+			plot(ax,xax,pin.U,'--','Color',mcolor('orange'),'DisplayName','Tidal velocity')%plot tidal velocity
+			plot(ax,xax,pin.v,'--','Color',mcolor('green'),'DisplayName','River velocity') %plot river velocity
+            plot(ax,xax,pin.s,'--','Color',mcolor('yellow'),'DisplayName','Stokes velocity') %plot river velocity
+            hold off
+            legend('Location','best') 
+            ylabel(plabels.y2)
+            xlabel(plabels.x)
+            title(plabels.title)
+        end
+%%
+        function setYaxisLimits(~,ax,dst)
+            %set the Y axis limits so they do not change when plot updated
+            h = dst.Elevation;
+            U = dst.Velocity;
+            v = dst.RiverVel;
+            s = dst.StokesVel;
+            AllV = [U,v,s];
+            AllV(AllV>3) = NaN;  %apply mask to remove excessively             
+            AllV(AllV<-3) = NaN; %large velocities (eg infinity)
+            lim1 = floor(min(h,[],'All'));
+            lim2 = ceil(max(h,[],'All'));
+            lim3 = floor(min(AllV,[],'All'));
+            lim4 = ceil(max(AllV,[],'All'));
+            yyaxis left          %fix left y-axis limits
+            ax.YLim = [lim1,lim2];
+            yyaxis right         %fix right y-axis limits
+            ax.YLim = [lim3,lim4];
+        end  
+%%
+        function hm = setSlideControl(obj,hfig,ptype,svar,dst,stxt)
+            %intialise slider to set different Q values   
+            invar = struct('sval',[],'smin',[],'smax',[],...
+                           'callback','','userdata',[],'position',[],...
+                           'stxext','','butxt','','butcback','');            
+            invar.sval = svar(1);      %initial value for slider 
+            invar.smin = svar(1);     %minimum slider value
+            invar.smax = svar(end);     %maximum slider value
+            invar.callback = @(src,evt)updateXTplot(obj,ptype,src,evt); %callback function for slider to use
+            invar.userdata = dst;  %pass userdata if required 
+            invar.position = [0.15,0.005,0.60,0.04]; %position of slider
+            invar.stext = stxt;   %text to display with slider value, if included          
+            invar.butxt =  'Save';    %text for button if included
+            invar.butcback = @(src,evt)saveanimation2file(obj.ModelMovie,src,evt); %callback for button
+            hm = setfigslider(hfig,invar);   
+        end         
+%%
+        function updateXTplot(obj,ptype,src,~)
+            %use the updated slider value to adjust the CST plot
+            sldui = findobj(src.Parent,'Tag','figslider');
+            dst = sldui.UserData;     %recover userdata
+            if strcmp('X @ T',ptype)
+                svar = dst.RowNames;
+                if isdatetime(svar)  || isduration(svar)
+                    svar = time2num(svar);
+                end
+            else
+                svar = dst.Dimensions.X;
+            end
+            
+            %use slider value to find the nearest set of results
+            stxt = findobj(src.Parent,'Tag','figsliderval');
+            idx = find(svar>src.Value,1,'first');            
+            XT = svar(idx);
+            stxt.String = num2str(XT);     %update slider text
+
+            %figure axes and update plot
+            ax = findobj(src.Parent,'Tag','PlotFigAxes'); 
+            pinput = getPlotInput(obj,dst,ptype,idx); %#ok<NASGU>
+            yyaxis 'left';
+            hpl = ax.Children;            
+            yyaxis 'right';
+            hpr = ax.Children;
+            hp = [hpr;hpl];
+            refreshdata(hp,'caller');
+            drawnow;
+        end
+%%
         function [dsp1,dsp2] = modelDSproperties(~) 
             %define a dsproperties struct and add the model metadata
             dsp1 = struct('Variables',[],'Row',[],'Dimensions',[]); 

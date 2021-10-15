@@ -216,17 +216,17 @@ classdef CSTmodel < muiModelUI
 %%
         function loadMenuOptions(obj,src,~)
             %callback functions to import data
-            classname = 'muiUserData';
+            classname = 'CSTdataimport';
             switch src.Text
                 case 'Load'
                     fname = sprintf('%s.loadData',classname);
                     callStaticFunction(obj,classname,fname); 
                 case 'Add'
-                    useCase(obj.Cases,'single',classname,'addData');
+                    useCase(obj.Cases,'single',{classname},'addData');
                 case 'Delete'
-                    useCase(obj.Cases,'single',classname,'deleteData');
+                    useCase(obj.Cases,'single',{classname},'deleteData');
                 case 'Quality Control'
-                    useCase(obj.Cases,'single',classname,'qcData');
+                    useCase(obj.Cases,'single',{classname},'qcData');
             end
             DrawMap(obj);
         end   
@@ -238,7 +238,7 @@ classdef CSTmodel < muiModelUI
                 case 'Run Model'                             
                     CSTrunmodel.runModel(obj); 
                 case 'Derive Output'
-                    obj.mUI.Manip = muiManipUI.getManipUI(obj);
+                    obj.mUI.ManipUI = muiManipUI.getManipUI(obj);
             end            
         end               
             
