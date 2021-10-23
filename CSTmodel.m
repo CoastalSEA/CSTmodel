@@ -140,7 +140,7 @@ classdef CSTmodel < muiModelUI
             tabs.Form = {'   Form   ',@obj.getFormPlot};
             tabs.xPlot   = {'  X-Plot  ',@obj.getTabData};
             tabs.xtPlot   = {'  XT-Plot  ',@obj.getTabData};
-            tabs.Stats = {'   Stats   ',@obj.getTabData};
+            tabs.Stats = {'   Stats   ',@obj.setTabAction};
             subtabs = [];   %empty returned if no subtabs specified
         end
        
