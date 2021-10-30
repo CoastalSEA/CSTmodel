@@ -1,4 +1,26 @@
 function [x,iter,err_mess]=newtonm(x0,f,J)
+%
+%-------function help------------------------------------------------------
+% NAME
+%   newtonm.m
+% PURPOSE
+%   Newton-Raphson solution of the Jacobian
+% USAGE
+%   [x,iter,err_mess]=newtonm(x0,f,J)
+% INPUTS
+%   x0 - 
+%   f - 
+%   J - 
+% OUTPUTS
+%   x - 
+%   iter - number of iterations
+%   err_mess - error message
+% SEE ALSO
+%   used in cst_model.m
+%
+% Author: HuaYang Cai, tu Delft
+%--------------------------------------------------------------------------
+%
 N=300;
 epsilon=1e-10;
 maxval=1000.0;
@@ -37,7 +59,7 @@ while(N>0)
         iter=300-N;
         disp(['iterations = ',num2str(iter)]);
         error('Solution diverges');
-        abort;
+%         abort;
     end
     N=N-1;
     xx=xn;

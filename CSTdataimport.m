@@ -4,7 +4,7 @@ classdef CSTdataimport < muiDataSet
 % NAME
 %   CSTdataimport.m
 % PURPOSE
-%   Class to illustrate importing a data set, adding the results to dstable
+%   Class to import a data set, adding the results to dstable
 %   and a record in a dscatlogue (as a property of muiCatalogue)
 % USAGE
 %   obj = CSTdataimport()

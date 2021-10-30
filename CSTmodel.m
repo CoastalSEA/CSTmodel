@@ -4,7 +4,7 @@ classdef CSTmodel < muiModelUI
 % NAME
 %   CSTmodel.m
 % PURPOSE
-%   Main GUI for CSTmodel interface, which implements the 
+%   Main UI for CSTmodel interface, which implements the 
 %   muiModelUI abstract class to define main menus.
 % SEE ALSO
 %   Abstract class muiModelUI.m and tools provided in muitoolbox

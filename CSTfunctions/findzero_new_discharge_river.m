@@ -1,8 +1,28 @@
-%***********************
-%output:x(1)=mu;x(2)=delta;x(3)=lambda
-%input:gamma,chi
-%***********************
 function [y,iter] = findzero_new_discharge_river(gamma, chi, rs,phi,zeta,x0)
+%
+%-------function help------------------------------------------------------
+% NAME
+%   findzero_new_discharge_river.m
+% PURPOSE
+%   find y for given gamma and chi with dominant river discharge
+% USAGE
+%   [y,iter] = findzero_new_discharge_river(gamma, chi, rs,phi,zeta,x0)
+% INPUTS
+%   gamma - estuary shape number
+%   chi   - friction number
+%   rs - 
+%   phi - 
+%   zeta - 
+%   x0 - 
+% OUTPUTS
+%   y - 
+%   iter - number of iterations
+% SEE ALSO
+%   used in cst_model.m
+%
+% Author: HuaYang Cai, tu Delft
+%--------------------------------------------------------------------------
+%
     %find mu and delta for given gamma and chi with dominant river discharge
     ga=acos(-phi);
     if(phi==0)
