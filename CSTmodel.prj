@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="2545066953" file="D:\Work\Tools\MATLAB\MUImodels2\muiApps\CSTmodel\CSTmodel.prj" location="D:\Work\Tools\MATLAB\MUImodels2\muiApps\CSTmodel" name="CSTmodel" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="3226477561" file="D:\Work\Tools\MATLAB\MUImodels2\muiApps\CSTmodel\CSTmodel.prj" location="D:\Work\Tools\MATLAB\MUImodels2\muiApps\CSTmodel" name="CSTmodel" target="target.mlapps" target-name="Package App">
     <param.appname>CSTmodel</param.appname>
     <param.authnamewatermark>Ian Townend</param.authnamewatermark>
     <param.email>i.townend@soton.ac.uk</param.email>
@@ -32,6 +32,9 @@
       <file>${PROJECT_ROOT}\CSTmodel.m</file>
     </fileset.main>
     <fileset.depfun>
+      <file>C:\Users\Ian\AppData\Roaming\MathWorks\MATLAB Add-Ons\Apps\CSTmodel\CSTparameters.m</file>
+      <file>C:\Users\Ian\AppData\Roaming\MathWorks\MATLAB Add-Ons\Apps\CSTmodel\CSTrunmodel.m</file>
+      <file>C:\Users\Ian\AppData\Roaming\MathWorks\MATLAB Add-Ons\Apps\CSTmodel\CSTrunparams.m</file>
       <file>${PROJECT_ROOT}\cst_model.m</file>
       <file>${PROJECT_ROOT}\CSTformprops.m</file>
       <file>${PROJECT_ROOT}\CSTparameters.m</file>
@@ -39,7 +42,9 @@
       <file>${PROJECT_ROOT}\CSTrunparams.m</file>
     </fileset.depfun>
     <fileset.resources>
+      <file>${PROJECT_ROOT}\cst_dataformat.m</file>
       <file>${PROJECT_ROOT}\CST_logo.jpg</file>
+      <file>${PROJECT_ROOT}\CSTdataimport.m</file>
       <file>${PROJECT_ROOT}\CSTfunctions</file>
       <file>${PROJECT_ROOT}\doc</file>
       <file>${PROJECT_ROOT}\example</file>
