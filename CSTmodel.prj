@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration build-checksum="2863246077" file="D:\Work\Tools\MATLAB\MUImodels2\muiApps\CSTmodel\CSTmodel.prj" location="D:\Work\Tools\MATLAB\MUImodels2\muiApps\CSTmodel" name="CSTmodel" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="2901707070" file="D:\Work\Tools\MATLAB\MUImodels2\muiApps\CSTmodel\CSTmodel.prj" location="D:\Work\Tools\MATLAB\MUImodels2\muiApps\CSTmodel" name="CSTmodel" target="target.mlapps" target-name="Package App">
     <param.appname>CSTmodel</param.appname>
     <param.authnamewatermark>Ian Townend</param.authnamewatermark>
     <param.email>i.townend@soton.ac.uk</param.email>
@@ -13,7 +13,7 @@
     <param.summary>Computes the mean tide level, high and low water levels, tidal velocity amplitude and river velocity for  a convergent estuary channel.</param.summary>
     <param.description>This model computes the mean tide level, high and low water levels, tidal velocity amplitude and river velocity along the length of a convergent estuary using the analytical model of Cai, Savenije and Toffolon (hence the CST model) as described in (Savenije, 2005; Cai, 2014).</param.description>
     <param.screenshot>${PROJECT_ROOT}\CST_logo.jpg</param.screenshot>
-    <param.version>1.0</param.version>
+    <param.version>2.0</param.version>
     <param.products.name>
       <item>MATLAB</item>
     </param.products.name>
@@ -27,7 +27,6 @@
     <param.output>${PROJECT_ROOT}</param.output>
     <param.guid>35f85c95-efcd-4958-a6f9-4b7e902b8080</param.guid>
     <unset>
-      <param.version />
       <param.platforms />
       <param.output />
     </unset>

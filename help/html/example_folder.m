@@ -3,4 +3,9 @@ function example_folder()
 appinfo = matlab.apputil.getInstalledAppInfo;
 idx = find(strcmp({appinfo.name},'CSTmodel'));
 fpath = [appinfo(idx(1)).location,'/example'];
-winopen(fpath)
+try
+    winopen(fpath)
+catch
+    msg = sprintf('The examples can be found here:\n%s',fpath);
+    msgbox(msg)
+end
