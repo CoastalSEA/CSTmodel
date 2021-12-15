@@ -50,7 +50,17 @@ classdef CSTrunmodel < muiDataSet
             inpobj = getClassObj(mobj,'Inputs','CSTparameters');
             rnpobj = getClassObj(mobj,'Inputs','CSTrunparams');
             estobj = getClassObj(mobj,'Inputs','CSTformprops');  %can be empty
-            [resX,resXT,mtime,xy] = cst_model(inpobj,rnpobj,estobj);
+            try
+                [resX,resXT,mtime,xy] = cst_model(inpobj,rnpobj,estobj);
+            catch
+                %remove the waitbar if program did not complete
+                hw = findall(0,'type','figure','tag','TMWWaitbar');
+                delete(hw);
+                warndlg('No solution found in cst_model');
+                delete(obj);
+                return;
+            end
+
             %now assign results to object properties  
             modeltime = seconds(mtime{1});  %durataion data for rows 
             modeltime.Format = 'h';

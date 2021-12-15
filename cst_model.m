@@ -14,12 +14,16 @@ function [resX,resXT,time,xyz] = cst_model(inp,rnp,est)
 %   est  - handle to estuary form properties in CSTformprops class instance  
 % OUTPUTS
 %   resX - along channel results in cell array as follows
-%       ht = elevation and ut = velocity of flow over the tidal cycle
-%       eA = phase lag between HW and HWS
-%       ax = tidal amplitude and Ux = tidal velocity amplitude
-%       h_Qf = depth including increase in mean surface elevation
-%       vdis_Qf = river velocity taking account of increased surface elevation
+%       mean water suface elevation along estuary (zwx+zw0)
+%       elevation amplitude along estuary (ax)
+%       tidal velocity amplitude along estuary (Ux)        
+%       river flow velocity along estuary (urx)
+%       hydraulic depth at mtl (h_Qf)
 %   resXT - results for variables that are a function of x and t
+%       tidal elevation over a tidal cycle (ht)
+%       tidal velocity over tidal cycle (utt)
+%       river velocity scaled for tidal elevation (urt)
+%       Stokes drift velocity as a function of x and t (ust)
 %   time - model time in 
 %   xyz - along channel distances 
 % NOTES
@@ -41,7 +45,7 @@ function [resX,resXT,time,xyz] = cst_model(inp,rnp,est)
     time = {}; xyz = {}; resXT = {}; resX = {};
     g = 9.81;                 %acceleration due to gravity (m/s2)
 
-    %extract data omtp model variables
+    %extract data input model variables
     Le = inp.EstuaryLength;   %estuary length(m)
     Bo = inp.MouthWidth;      %width at mouth (m)
     Lb = inp.WidthELength;    %width convergence length (m)
@@ -61,10 +65,6 @@ function [resX,resXT,time,xyz] = cst_model(inp,rnp,est)
     dx = rnp.DistInt;       %distance increment along estuary
 
     %initialise space and time dimensions and x-t output variables
-%     xint = Le/delX;              
-%     x = (0:1:xint)'*Le/(xint);
-%     
-%     t = (0:1:tint)*(T)/(tint);
     xint = ceil(Le/dx); %ensure x is an exact number of intervals of delX
     x = 0:dx:(xint*dx);
     tint = ceil(T/dt);  %ensure t is an exact number of intervals of delT
@@ -164,7 +164,7 @@ function [resX,resXT,time,xyz] = cst_model(inp,rnp,est)
     kk=0;
     
 w_message=['CST model calculations in progress. Error=' num2str(sum_error)];
-hwait = waitbar(0,w_message);
+hwait = waitbar(0,w_message,'Name','cst_model');
 maxiter = 50;
 while (sum_error>0.01 && kk<maxiter)
     kk=kk+1;

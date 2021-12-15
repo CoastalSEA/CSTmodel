@@ -36,8 +36,7 @@ classdef CSTmodel < muiModelUI
         function obj = setMUI(obj)
             %initialise standard figure and menus    
             %classes required to run model, format:
-            %obj.ModelInputs.<model classname> = {'Param_class1',Param_class2',etc}
-            %                                        % << Edit to model and input parameters classnames 
+            %obj.ModelInputs.<model classname> = {'Param_class1',Param_class2',etc} parameters classnames 
             obj.ModelInputs.CSTrunmodel = {'CSTparameters','CSTrunparams'};
             %tabs to include in DataUIs for plotting and statistical analysis
             %select which of the options are needed and delete the rest
