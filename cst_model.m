@@ -1,13 +1,13 @@
-function [resX,resXT,time,xyz] = cst_model(inp,rnp,est)
+function [resX,xdim,resXT,time] = cst_model(inp,rnp,est)
 %
 %------ function help------------------------------------------------------
 % NAME
-%   CST_tide.m
+%   CST_model.m
 % PURPOSE
 %   calculate the mean tide level and tidal amplitude along an estuary
 %   only works for a single channel (not a network)
 % USAGE
-%    [res,addn,time,xyz] = cst_tide(inp,est)
+%    [resX,xdim,resXT,time] = cst_model(inp,rnp,est)
 % INPUTS
 %   inp  - handle to input data in CSTparameters class instance
 %   rnp  - handle to run parameters in CSTrunparams class instance
@@ -19,17 +19,20 @@ function [resX,resXT,time,xyz] = cst_model(inp,rnp,est)
 %       tidal velocity amplitude along estuary (Ux)        
 %       river flow velocity along estuary (urx)
 %       hydraulic depth at mtl (h_Qf)
+%   xdim - along channel distances 
 %   resXT - results for variables that are a function of x and t
 %       tidal elevation over a tidal cycle (ht)
 %       tidal velocity over tidal cycle (utt)
 %       river velocity scaled for tidal elevation (urt)
 %       Stokes drift velocity as a function of x and t (ust)
 %   time - model time in 
-%   xyz - along channel distances 
 % NOTES
 %   Cai, H., H. H. G. Savenije, and M. Toffolon, 2012, 
 %   A new analytical framework for assessing the effect of sea-level rise and dredging on tidal damping in estuaries, 
 %   Journal of Geophysical Research, 117, C09023, doi:10.1029/2012JC008000.
+% NOTE
+%   Default rnp.DistInt set to 5000. Reducing distance increases 
+%   resolution but also run time and sensitivity of solution
 % SEE ALSO
 %   f_new_2012 - analytical solution for mu,delta_new,lambda,epsilon
 %   f_toffolon_2011 - analytical solution for mu,delta_new,lambda,epsilon
@@ -42,7 +45,7 @@ function [resX,resXT,time,xyz] = cst_model(inp,rnp,est)
 % modified for use in ModelUI by Ian Townend
 %--------------------------------------------------------------------------
 %
-    time = {}; xyz = {}; resXT = {}; resX = {};
+    time = {}; xdim = {}; resXT = {}; resX = {};
     g = 9.81;                 %acceleration due to gravity (m/s2)
 
     %extract data input model variables
@@ -54,7 +57,7 @@ function [resX,resXT,time,xyz] = cst_model(inp,rnp,est)
     Br = inp.RiverWidth;      %upstream river width (m) 
     Ar = inp.RiverCSA;        %upstream river cross-sectional area (m^2)
     xsw = inp.xTideRiver;     %distance from mouth to estuary/river switch
-    kM = inp.Manning;          %Manning friction coefficient [mouth switch head]
+    kM = inp.Manning;         %Manning friction coefficient [mouth switch head]
     Rs = inp.StorageRatio;    %storage width ratio [mouth switch head] 
     a = inp.TidalAmplitude;   %tidal amplitude (m)
     T = inp.TidalPeriod*3600; %tidal period (hr) 
@@ -326,7 +329,7 @@ end
     end
 
     %Results in format for ModelUI (function of X only)
-    xyz{1} = x;
+    xdim{1} = x;
     time{1} = t;
     % 
     resX{1} = zwx'+zw0; %mean water suface elevation along estuary

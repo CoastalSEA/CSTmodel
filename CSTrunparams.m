@@ -5,6 +5,9 @@ classdef CSTrunparams < muiPropertyUI
 %   CSTrunparams.m
 % PURPOSE
 %   Class for run parameters to the CSTmodel
+% NOTE
+%   Default DistInt set to 5000. Reducing distance increases resolution but
+%   also run time and sensitivity of solution
 % USAGE
 %   obj = CSTrunparams.setInput(mobj); %mobj is a handle to Main UI
 % SEE ALSO
@@ -25,7 +28,7 @@ classdef CSTrunparams < muiPropertyUI
     
     properties
         TimeInt = 0.5   %time increment in analytical model (hrs)
-        DistInt = 5000  %distance increment along estuary (m)
+        DistInt = 5000  %distance increment along estuary (m) 
         useObs = false  %flag to indicate whether to use 
     end    
 

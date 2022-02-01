@@ -6,6 +6,9 @@ classdef CSTrunmodel < muiDataSet
 % PURPOSE
 %   Calculate the mean tide level and tidal amplitude along an estuary
 %   only works for a single channel (not a network)
+% NOTE
+%   Default CSTrunparams.DistInt set to 5000. Reducing distance increases 
+%   resolution but also run time and sensitivity of solution
 % SEE ALSO
 %   muiDataSet
 %
@@ -51,7 +54,7 @@ classdef CSTrunmodel < muiDataSet
             rnpobj = getClassObj(mobj,'Inputs','CSTrunparams');
             estobj = getClassObj(mobj,'Inputs','CSTformprops');  %can be empty
             try
-                [resX,resXT,mtime,xy] = cst_model(inpobj,rnpobj,estobj);
+                [resX,xy,resXT,mtime] = cst_model(inpobj,rnpobj,estobj);
             catch
                 %remove the waitbar if program did not complete
                 hw = findall(0,'type','figure','tag','TMWWaitbar');
@@ -104,16 +107,16 @@ classdef CSTrunmodel < muiDataSet
             dst = obj.Data.AlongEstuaryValues;
             x = dst.Dimensions.X; 
             z = dst.MeanTideLevel;  %mean tide level
-            a = dst.TidalElevAmp;  %tidal amplitude
-			U = dst.TidalVelAmp;  %tidal velocity amplitude
-			v = dst.RiverVel;  %river velocity 
-			d = dst.HydDepth;  %hydraulic depth
+            a = dst.TidalElevAmp;   %tidal amplitude
+			U = dst.TidalVelAmp;    %tidal velocity amplitude
+			v = dst.RiverVel;       %river velocity 
+			d = dst.HydDepth;       %hydraulic depth
             
             ht = findobj(src,'Type','axes');
             delete(ht);
             ax = axes('Parent',src,'Tag','Q-Plot');
 			yyaxis left
-            plot(x,z,'-r''DisplayName','MTL'); %plot time v elevation
+            plot(x,z,'-r','DisplayName','MTL'); %plot time v elevation
             hold on
             plot(x,(z+a),'-.b','DisplayName','HWL')%plot high water level
             plot(x,(z-a),'-.b','DisplayName','LWL')%plot low water level
@@ -131,7 +134,7 @@ classdef CSTrunmodel < muiDataSet
         end
 %%
         function xt_tabPlot(obj,src) 
-            %generate plot for display on Q-Plot tab
+            %generate plot for display on xt-Plot tab
             dst = obj.Data.TidalCycleValues;
             if ~isprop(dst,'Elevation')
                 dst = activatedynamicprops(dst);
