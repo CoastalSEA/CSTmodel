@@ -46,6 +46,11 @@ function [resX,xdim,resXT,time] = cst_model(inp,rnp,est)
 %--------------------------------------------------------------------------
 %
     time = {}; xdim = {}; resXT = {}; resX = {};
+    ok = matlab.addons.isAddonEnabled('Optimization Toolbox'); %requires v2017b
+    if ok<1
+        warndlg('Matlab ''Optimization Toolbox'' required to run the CSTmodel')
+        return; 
+    end
     g = 9.81;                 %acceleration due to gravity (m/s2)
 
     %extract data input model variables

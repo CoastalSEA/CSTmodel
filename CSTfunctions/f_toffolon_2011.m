@@ -1,3 +1,4 @@
+function [mu,delta,lambda,epsilon]=f_toffolon_2011(gamma,chi)
 %Analyticl solution for tidal dynamics proposed by Toffolon and Savenije (2011)
 %*************************Reference*******************************
 %Toffolon, M., and H. H. G. Savenije (2011), 
@@ -17,25 +18,16 @@
 % lambda  - celerity number
 % epsilon - phase lag between HW and HWS (or LW and LWS)
 % 
-%
 % AUTHOR
 % Huayang Cai (h.cai@tudelft.nl)
-%
+% iht changed for loop to a while loop 31/7/20
 %************************************************************
-function [mu,delta,lambda,epsilon]=f_toffolon_2011(gamma,chi)
     kappa=8/(3*pi);
     Gamma=1-gamma.^2/4;
     Omega=sqrt(Gamma.^2+chi.^2);
     K=sqrt((Omega-Gamma)/2);
     mu=1./sqrt(1+gamma.*K+2*K.^2);
     chi0=chi;
-    % iht modified 31/7/20
-    % for j=1:9
-    %     chi=chi0*kappa.*mu;
-    %     Omega=sqrt(Gamma.^2+chi.^2);
-    %     K=sqrt((Omega-Gamma)/2);
-    %     mu=1./sqrt(1+gamma.*K+2*K.^2);
-    % end
     diff = 1;
     while diff>0.001
         mu0 = mu;
@@ -45,7 +37,6 @@ function [mu,delta,lambda,epsilon]=f_toffolon_2011(gamma,chi)
         mu=1./sqrt(1+gamma.*K+2*K.^2);   
         diff = abs(mu-mu0);
     end
-    % end of modification
     delta=gamma/2-K;
     epsilon=atan(chi./(gamma.*K+2*K.^2));
     lambda=sqrt(K.^2+Gamma);
