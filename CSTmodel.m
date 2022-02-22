@@ -253,7 +253,7 @@ classdef CSTmodel < muiModelUI
 
         %% Help menu ------------------------------------------------------
         function Help(~,~,~)
-            docsearch CSTmodel                              
+            doc cstmodel                              
         end
     end
 end    
