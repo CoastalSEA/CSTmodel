@@ -158,16 +158,19 @@ classdef CSTmodel < muiModelUI
                 'CSTrunparams','Inputs',[0.95,0.95],{180,60},'Run parameters:'};
         end    
  %%
-        function setTabAction(~,src,cobj)
+        function setTabAction(obj,src,cobj)
             %function required by muiModelUI and sets action for selected
             %tab (src)
+            msg = 'No results to display';
             switch src.Tag                                   
                 case 'xPlot' 
                      tabPlot(cobj,src);
                 case 'xtPlot'
                      xt_tabPlot(cobj,src);
                 case 'Stats'
-                     tabStats(cobj,src);   
+                    lobj = getClassObj(obj,'mUI','Stats',msg);
+                    if isempty(lobj), return; end
+                    tabStats(lobj,src);   
             end
         end    
 %%

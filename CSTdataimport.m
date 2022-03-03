@@ -35,32 +35,27 @@ classdef CSTdataimport < muiDataSet
 %%
         function tabPlot(obj,src)
             %generate plot for display on Q-Plot tab
-            dst = obj.Data.AlongEstuaryValues;
-            x = dst.Dimensions.X; 
-            z = dst.MeanTideLevel;  %mean tide level
-            a = dst.TidalElevAmp;  %tidal amplitude
-			U = dst.TidalVelAmp;  %tidal velocity amplitude
-            d = dst.HydDepth;  %hydraulic depth
-            ht = findobj(src,'Type','axes');
-            delete(ht);
-            ax = axes('Parent',src,'Tag','Q-Plot');
-			yyaxis left
-            plot(x,z,'-r');             %plot time v elevation
-            hold on
-            plot(x,(z+a),'-.b')       %plot high water level
-            plot(x,(z-a),'-.b')       %plot low water level
-			plot(x,(z-d),'-k');       %hydraulic depth below mean tide level
-            ylabel('Elevation (mOD)'); 
-			yyaxis right
-			plot(x,U,'--','Color',mcolor('orange')) %plot tidal velocity
-% 			plot(x,v,'--','Color',mcolor('green'))) %plot river velocity
-            hold off
-            xlabel('Distance from mouth (m)'); 
-            ylabel('Velocity (m/s)'); 
-			legend('MTL','HWL','LWL','Hydraulic depth',...
-                'Tidal velocity','Location','best');			
-            title ('Along channel variation');
-            ax.Color = [0.96,0.96,0.96];  %needs to be set after plot
+            if strcmp(src.Tag,'FigButton')
+                hfig = figure('Tag','PlotFig');
+                ax = axes('Parent',hfig,'Tag','PlotFig','Units','normalized');
+                channelOuputPlot(obj,ax);                
+            else
+                ht = findobj(src,'Type','axes');
+                delete(ht);
+                ax = axes('Parent',src,'Tag','Q-Plot');
+                channelOuputPlot(obj,ax); 
+                hb = findobj(src,'Tag','FigButton');
+                if isempty(hb)
+                    %button to create plot as stand-alone figure
+                    uicontrol('Parent',src,'Style','pushbutton',...
+                        'String','>Figure','Tag','FigButton',...
+                        'TooltipString','Create plot as stand alone figure',...
+                        'Units','normalized','Position',[0.88 0.95 0.10 0.044],...
+                        'Callback',@(src,evdat)tabPlot(obj,src));
+                else
+                    hb.Callback = @(src,evdat)tabPlot(obj,src);
+                end
+            end 
         end     
 %%
         function xt_tabPlot(obj,src) 
@@ -164,6 +159,34 @@ classdef CSTdataimport < muiDataSet
             xlabel(plabels.x)
             title(plabels.title)
         end
+%%
+        function channelOuputPlot(obj,ax)
+            %default graphic for X-Plot tab or stand-alone figure
+            dst = obj.Data.AlongEstuaryValues;
+            x = dst.Dimensions.X; 
+            z = dst.MeanTideLevel;  %mean tide level
+            a = dst.TidalElevAmp;   %tidal amplitude
+			U = dst.TidalVelAmp;    %tidal velocity amplitude
+            % v = dst.RiverVel;       %river velocity 
+			d = dst.HydDepth;       %hydraulic depth
+            %gerenate plot
+            yyaxis left
+            plot(x,z,'-r','DisplayName','MTL'); %plot time v elevation
+            hold on
+            plot(x,(z+a),'-.b','DisplayName','HWL')%plot high water level
+            plot(x,(z-a),'-.b','DisplayName','LWL')%plot low water level
+			plot(x,(z-d),'-k','DisplayName','Hydraulic depth')%hydraulic depth below mean tide level
+            ylabel('Elevation (mOD)'); 
+			yyaxis right
+			plot(x,U,'--','Color',mcolor('orange'),'DisplayName','Tidal velocity')%plot tidal velocity
+			% plot(x,v,'--','Color',mcolor('green'),'DisplayName','River velocity') %plot river velocity
+            hold off
+            xlabel('Distance from mouth (m)'); 
+            ylabel('Velocity (m/s)'); 
+			legend('Location','best');			
+            title ('Along channel variation');
+            ax.Color = [0.96,0.96,0.96];  %needs to be set after plo
+        end        
 %%
         function setYaxisLimits(~,ax,dst)
             %set the Y axis limits so they do not change when plot updated

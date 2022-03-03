@@ -21,11 +21,11 @@
 
         <!-- User Guide comes next -->
         <tocitem target="cstmodel_guide.html" 
-            image="HelpIcon.USER_GUIDE">cstmodel User Guide
+            image="HelpIcon.USER_GUIDE">CSTmodel User Guide
             <tocitem target="cstmodel_menus.html">Menu options</tocitem>    
             <tocitem target="cstmodel_tabs.html">Tab options</tocitem>    
-            <tocitem target="cstmodel_examples.html">cstmodel examples</tocitem>  
-            <tocitem target="cstmodel_functions.html">cstmodel classes and functions</tocitem> 
+            <tocitem target="cstmodel_examples.html">CSTmodel examples</tocitem>  
+            <tocitem target="cstmodel_functions.html">CSTmodel classes and functions</tocitem> 
         </tocitem>
     </tocitem>    
         <!-- Optional List of Examples, with hyperlinks to examples in other files -->
