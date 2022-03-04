@@ -30,14 +30,39 @@
 % * *Run Parameters*: dialogue to define model run time parameters.
 % * *Estuary Properties*: dailogue to load estuary form properties from a
 % file.
+%%
+% <html>
+% <table border=1><u>Estuary Properties file format</u>: 1 line for header and 5
+% columns of data as follows:<br>
+% <ul>  x - Distance from mouth,<br>
+% Amtl - Area at mean tide level,<br>
+% Whw - Width at high water,<br>
+% Wlw - Width at low water,<br>
+% Manning_N - Mannings N (optional)</ul> 
+% </table>
+% </html>
 
 %%
-%  File format - 1 line for header and 5 columns of data as follows:
-%  x, Amtl, Whw, Wlw, Manning_N(optional)
-%  Distance from mouth, Area at mean tide level, Width at high water, Width at low water, Mannings N
-
+% * *Import Data*: dialogue to import observed or model data from a file. 
+% Option to load data of _Along-channel Properties_ and variations of
+% _Elevation_ and _Velocity_ over a tidal cycle.
 %%
-% * *Import Data*: dialogue to import observed or model data from a file.
+% <html>
+% <table border=1><u>Along-channel Properties file format</u>: 1 line for header and 5
+% columns of data as follows:<br>
+% <ul>dist - along channel distance,<br>
+%       msl - mean water level,<br>
+%       z-amp - tidal amplitude,<br>
+%       u-amp - velocity amplitude,<br>	
+%       hyd-depth - hydraulic depth</ul>
+% </table>
+% <table border=1><u>Elevation and Velocity file format</u>: 
+% 1 line for header, 1 column for time 
+% and N columns for elevation or velocity at each time interval, where
+% N is the number of distances included in the along channel properties file.
+% </table>
+% </html>
+%%
 % * *Model Constants*: a number of constants are used in the model. Generally, the default values are appropriate but these can be adjusted and saved with the project if required.
 
 %% Run

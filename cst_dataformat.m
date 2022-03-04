@@ -45,91 +45,70 @@ function dst = getData(obj,filename)
     if isempty(dataX), dst = []; return; end
     
     %set metadata
-    [dsp1,dsp2] = setDSproperties;
+    [dsp1,dsp2,dsp3] = setDSproperties;
     
     %each variable should be an array in the 'results' cell array
     %if model returns single variable as array of doubles, use {results}
     dataX = cellfun(@transpose,dataX,'UniformOutput',false);
     dst1 = dstable(dataX{:},'DSproperties',dsp1);
     dst1.Dimensions.X = x;     %grid x-coordinate
-
-    dst2 = dstable(dataHT,dataUT,'RowNames',hours(t),'DSproperties',dsp2);
-    dst2.Dimensions.X = x;     %grid x-coordinate    
-
-    %assign metadata about model (details of source file are dealt with in
-    %muiDataSet.loadData)
     dst1.MetaData = metaclass(obj).Name; %Any additional information to be saved';
-    dst2.MetaData = metaclass(obj).Name; %Any additional information to be saved';    
-
-    dst.AlongEstuaryValues = dst1;
-    dst.TidalCycleValues = dst2;              
+    dst.AlongEstuary = dst1;
+    
+    if ~isempty(dataHT)
+        dst2 = dstable(dataHT,'RowNames',hours(t.h),'DSproperties',dsp2);
+        dst2.Dimensions.X = x;     %grid x-coordinate   
+        dst2.MetaData = metaclass(obj).Name; %Any additional information to be saved';    
+        dst.TidalCycleElevation = dst2; 
+    end
+    
+    if ~isempty(dataUT)
+        dst3 = dstable(dataUT,'RowNames',hours(t.u),'DSproperties',dsp3);
+        dst3.Dimensions.X = x;     %grid x-coordinate  
+        dst3.MetaData = metaclass(obj).Name; %Any additional information to be saved';
+        dst.TidalCycleVelocity = dst3; 
+    end
 end
 %%
 function [dataX,dataHT,dataUT,x,t] = readInputData(filename)
     %default is to load the along channel data (MSL,z-amp,u-amp,depth)    
     dataSpec = '%f %f %f %f %f'; 
-    [data,~] = readinputfile(filename,1,dataSpec); %see muifunctions
+    [data,~] = readinputfile(filename,1,dataSpec); %in dsfunctions
     if isempty(data), return; end
     x = data{1};
     dataX = data(2:end);
     
-    %prompt to add the XT data for elevation and velocity
     dataHT = []; dataUT = []; t = [];
-    [fname,path,nfiles] = getfiles('MultiSelect','on',...
-                'FileType','*.txt;*.csv','PromptText','Select H & U file:');
-    if nfiles==0        
-        return;
-    elseif iscell(fname)
-        filename = [path fname{1}]; %multiselect returns cell array
-    else
+    %prompt to add the XT data for elevation     
+    [fname,path,nfiles] = getfiles('MultiSelect','off',...
+                'FileType','*.txt;*.csv','PromptText','Select X-T Elevation file:');
+    if nfiles>0        
         filename = [path fname];    %single select returns char
+        %read Elevation data file
+        data = readmatrix(filename,'NumHeaderLines',1);
+        t.h = data(:,1);
+        dataHT = data(:,2:end);
     end
-    %read first data file
-    dataSpec = repmat('%f\t',1,length(x)); %+1 accounts for t column
-    dataSpec = [dataSpec,'%f'];
-    data{1} = readmatrix(filename,'NumHeaderLines',1);
-    [~,header{1}] = readinputfile(filename,1,dataSpec); %see muifunctions
-    if isempty(data),return; end
-    %read second data file
-    
-    if iscell(fname) && length(fname)>1
-        filename = [path fname{2}];
-        data{2} = readmatrix(filename,'NumHeaderLines',1);
-        [~,header{2}] = readinputfile(filename,1,dataSpec); %see muifunctions
+
+    %prompt to add the XT data for velocity
+    [fname,path,nfiles] = getfiles('MultiSelect','off',...
+                'FileType','*.txt;*.csv','PromptText','Select X-T Velocity file:');
+    if nfiles>0        
+        filename = [path fname];    %single select returns char
+        %read Velocity data file
+        data = readmatrix(filename,'NumHeaderLines',1);
+        t.u = data(:,1);
+        dataUT = data(:,2:end);
     end
-    %assign to elevation and velocity variables using header text
-    for i=1:length(header)
-        headtxt = strip(header{i}{1});
-        if contains('Elevation',headtxt)
-            dataHT = data{i};
-        elseif contains('Velocity',headtxt)
-            dataUT = data{i};
-        end
-    end
-    t = dataHT(:,1);
-    dataHT = dataHT(:,2:end);
-    if ~isempty(dataUT)
-        dataUT = dataUT(:,2:end);
-    end
-    
-%     nt = size(dataHT,1);
-%     tstep = 12.4*60/nt;
-%     answer = inputdlg({'Number of time steps','Time step (mins)'},'CSTimport',...
-%                        1,{num2str(nt),num2str(tstep)});
-%     if ~isempty(answer)
-%         nt = str2double(answer{1});
-%         tstep = str2double(answer{2});
-%     end
-%     t = 0:tstep:nt*tstep;   
 end
 %%
 %--------------------------------------------------------------------------
 % dataDSproperties
 %--------------------------------------------------------------------------
-function [dsp1,dsp2] = setDSproperties(~) 
+function [dsp1,dsp2,dsp3] = setDSproperties(~) 
     %define a dsproperties struct and add the model metadata
     dsp1 = struct('Variables',[],'Row',[],'Dimensions',[]); 
-    dsp2 = dsp1;
+    dsp2 = dsp1; dsp3 = dsp1;
     %define each variable to be included in the data table and any
     %information about the dimensions. dstable Row and Dimensions can
     %accept most data types but the values in each vector must be unique
@@ -162,11 +141,11 @@ function [dsp1,dsp2] = setDSproperties(~)
 
     %dynamic values
     dsp2.Variables = struct(...                       
-        'Name',{'Elevation','Velocity'},...
-        'Description',{'Elevation','Tidal velocity'},...
-        'Unit',{'m','m/s'},...
-        'Label',{'Elevation (m)','Velocity (m/s)'},...
-        'QCflag',repmat({'model'},1,2)); 
+        'Name',{'Elevation'},...
+        'Description',{'Elevation'},...
+        'Unit',{'m'},...
+        'Label',{'Elevation (m)'},...
+        'QCflag',{'model'}); 
     dsp2.Row = struct(...
         'Name',{'Time'},...
         'Description',{'Time'},...
@@ -179,6 +158,26 @@ function [dsp1,dsp2] = setDSproperties(~)
         'Unit',{'m'},...
         'Label',{'Distance from mouth (m)'},...
         'Format',{'-'});  
+    
+    %dynamic values
+    dsp3.Variables = struct(...                       
+        'Name',{'Velocity'},...
+        'Description',{'Tidal velocity'},...
+        'Unit',{'m/s'},...
+        'Label',{'Velocity (m/s)'},...
+        'QCflag',{'model'}); 
+    dsp3.Row = struct(...
+        'Name',{'Time'},...
+        'Description',{'Time'},...
+        'Unit',{'h'},...
+        'Label',{'Time (h)'},...
+        'Format',{'h'});         
+    dsp3.Dimensions = struct(...    
+        'Name',{'X'},...
+        'Description',{'Chainage'},...
+        'Unit',{'m'},...
+        'Label',{'Distance from mouth (m)'},...
+        'Format',{'-'});     
 end
 %%
 %--------------------------------------------------------------------------

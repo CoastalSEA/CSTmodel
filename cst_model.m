@@ -91,12 +91,9 @@ function [resX,xdim,resXT,time] = cst_model(inp,rnp,est)
         A = interp1(Ximp,dst.Amtl,x,'pchip');
         B = interp1(Ximp,(dst.Whw+dst.Wlw)/2,x,'pchip');    %width at mean tide level
         rs = interp1(Ximp,dst.Whw./dst.Wlw,x,'pchip');       %storage ratio
-        if all(isnan(dst.N))
-            if length(kM)==3
-                Ks = interp1([0 xsw Le],kM,x,'linear');
-            elseif length(kM)~=length(x)
-                Ks = ones(size(x))*kM;
-            end
+        if all(isnan(dst.N))%not defined in file - loaded as NaN
+            Ks = interpChannelVar(kM,xsw,Le,x);
+            if isempty(Ks), return; end
         else
             Ks = interp1(Ximp,dst.N,x);       %Manning coefficient
         end
@@ -104,17 +101,9 @@ function [resX,xdim,resXT,time] = cst_model(inp,rnp,est)
         % compute default area, width and depth values
         A = Ar+(Ao-Ar)*exp(-x/LA); 
         B = Br+(Bo-Br)*exp(-x/Lb);
-        if length(Rs)==length(xsw)+2
-            rs = interp1([0 xsw Le],Rs,x,'linear');
-        elseif length(Rs)~=length(x)
-            rs = ones(size(x))*Rs;
-        end
-        %
-        if length(kM)~=length(x)
-        	Ks = interp1([0 xsw Le],kM,x,'linear');
-        elseif length(kM)~=length(x)
-            Ks = ones(size(x))*kM;
-        end
+        rs = interpChannelVar(Rs,xsw,Le,x);
+        Ks = interpChannelVar(kM,xsw,Le,x);
+        if isempty(rs) || isempty(Ks), return; end
     end
     h0 = A./B;
     h = h0';
@@ -348,12 +337,24 @@ end
     resXT{3} = urt';    %river velocity scaled for tidal elevation
     resXT{4} = ust';    %Stokes drift velocity as a function of x and t
 end
-    
-    
-    
-    
-       
-    
+%%
+function outVar = interpChannelVar(inVar,xsw,Le,x)
+    %interpolate the variation of along channel properties based on the
+    %type of input provided
+    nVar = length(inVar); 
+    nxsw = length(xsw);    
+    if nVar==nxsw+2   %number of intervals correctly defined
+        outVar = interp1([0 xsw Le],inVar,x,'linear');
+    elseif nVar>1 && nVar~=length(x)
+        warndlg('Incorrect definition of Manning coefficient')
+        outVar = [];
+        return;
+    elseif nVar==1    %single value specified
+        outVar = ones(size(x))*inVar;
+    else             %values for all x specified
+        outVar = inVar;
+    end       
+end
     
     
     

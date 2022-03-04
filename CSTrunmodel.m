@@ -67,7 +67,9 @@ classdef CSTrunmodel < muiDataSet
                 delete(obj);
                 return;
             end
-
+            %
+            if isempty(resX), return; end  %probable error in data input
+            
             %now assign results to object properties  
             modeltime = seconds(mtime{1});  %durataion data for rows 
             modeltime.Format = 'h';
@@ -323,7 +325,9 @@ classdef CSTrunmodel < muiDataSet
 
             %figure axes and update plot
             ax = findobj(src.Parent,'Tag','PlotFigAxes'); 
-            pinput = getPlotInput(obj,dst,ptype,idx); %#ok<NASGU>
+            pinput = getPlotInput(obj,dst,ptype,idx);
+            isok = ~any(cellfun(@isempty,struct2cell(pinput)));
+            if ~isok, return; end %trap moving cursor to end of slider
             yyaxis 'left';
             hpl = ax.Children;            
             yyaxis 'right';
