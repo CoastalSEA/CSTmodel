@@ -109,28 +109,10 @@ classdef CSTrunmodel < muiDataSet
 %%
     methods
         function tabPlot(obj,src) %abstract class for muiDataSet
-            %generate plot for display on Q-Plot tab            
-            if strcmp(src.Tag,'FigButton')
-                hfig = figure('Tag','PlotFig');
-                ax = axes('Parent',hfig,'Tag','PlotFig','Units','normalized');
-                channelOuputPlot(obj,ax);                
-            else
-                ht = findobj(src,'Type','axes');
-                delete(ht);
-                ax = axes('Parent',src,'Tag','Q-Plot');
-                channelOuputPlot(obj,ax); 
-                hb = findobj(src,'Tag','FigButton');
-                if isempty(hb)
-                    %button to create plot as stand-alone figure
-                    uicontrol('Parent',src,'Style','pushbutton',...
-                        'String','>Figure','Tag','FigButton',...
-                        'TooltipString','Create plot as stand alone figure',...
-                        'Units','normalized','Position',[0.88 0.95 0.10 0.044],...
-                        'Callback',@(src,evdat)tabPlot(obj,src));
-                else
-                    hb.Callback = @(src,evdat)tabPlot(obj,src);
-                end
-            end
+            %generate plot for display on Q-Plot tab 
+            tabcb =  @(src,evdat)tabPlot(obj,src);
+            ax = tabfigureplot(obj,src,tabcb,false); %rotate button not required
+            channelOuputPlot(obj,ax);
         end
 %%
         function xt_tabPlot(obj,src) 
