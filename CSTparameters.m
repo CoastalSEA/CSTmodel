@@ -35,7 +35,7 @@ classdef CSTparameters < muiPropertyUI
     end
     
     properties
-        EstuaryLength   %estuary length (m)
+        EstuaryLength   %estuary length (m) aka length of model domain
         MouthWidth      %width at mouth (m)
         WidthELength    %width convergence length (m) =0 import from file
         MouthCSA        %area at mouth (m^2)

@@ -54,7 +54,7 @@ function [resX,xdim,resXT,time] = cst_model(inp,rnp,est)
     g = 9.81;                 %acceleration due to gravity (m/s2)
 
     %extract data input model variables
-    Le = inp.EstuaryLength;   %estuary length(m)
+    Le = inp.EstuaryLength;   %estuary length(m) aka length of model domain
     Bo = inp.MouthWidth;      %width at mouth (m)
     Lb = inp.WidthELength;    %width convergence length (m)
     Ao = inp.MouthCSA;        %area at mouth (m^2)
