@@ -140,6 +140,7 @@ classdef CSTformprops < handle
         function [data,header,filename] = readInputData(~) 
             %read wind data (read format is file specific).
             [fname,path,~] = getfiles('FileType','*.txt');
+            if fname==0, data = []; header = []; filename = []; return; end
             filename = [path fname];
             dataSpec = '%f %f %f %f %f'; 
             nhead = 1;     %number of header lines
