@@ -15,8 +15,8 @@ classdef CSTmodel < muiModelUI
 % 
     properties  (Access = protected)
         %implement properties defined as Abstract in muiModelUI
-        vNumber = '2.0'
-        vDate   = 'Oct 2021'
+        vNumber = '2.1'
+        vDate   = 'Jan 2024'
         modelName = 'CSTmodel'                     
         %Properties defined in muiModelUI that need to be defined in setGui
         % ModelInputs  %classes required by model: used in isValidModel check 
@@ -65,7 +65,7 @@ classdef CSTmodel < muiModelUI
             %menu. Main menu labels are defined in sequential order and 
             %submenus in order following each brach to the lowest level 
             %before defining the next branch.         
-                                                              % << Edit menu to suit model 
+                                                            
             MenuLabels = {'File','Tools','Project','Setup','Run',...
                                                         'Analysis','Help'};
             menu = menuStruct(obj,MenuLabels);  %create empty menu struct
@@ -90,10 +90,10 @@ classdef CSTmodel < muiModelUI
             
             %list as per muiModelUI.projectMenuOptions
             % submenu for Scenarios
-            menu.Project(2).List = {'Edit Description','Edit Data Set',...
+            menu.Project(2).List = {'Edit Description','Edit DS properties','Edit Data Set',...
                                     'Save Data Set','Delete Case','Reload Case',...
                                     'View Case Settings'};                                               
-            menu.Project(2).Callback = repmat({@obj.projectMenuOptions},[1,6]);
+            menu.Project(2).Callback = repmat({@obj.projectMenuOptions},[1,7]);
             
             % submenu for 'Export/Import'                                          
             menu.Project(3).List = {'Export Case','Import Case'};
@@ -121,7 +121,8 @@ classdef CSTmodel < muiModelUI
             menu.Analysis(1).Callback = repmat({@obj.analysisMenuOptions},[1,2]);
             
             %% Help menu --------------------------------------------------
-            menu.Help(1).Callback = {@obj.Help}; %make model specific?
+            menu.Help.List = {'Documentation','Manual'};
+            menu.Help.Callback = repmat({@obj.Help},[1,2]);
             
         end
         
@@ -137,7 +138,7 @@ classdef CSTmodel < muiModelUI
             %format for subtabs: 
             %    subtabs.<tagname>(i,:) = {<subtab label>,<callback function>};
             %where <tagname> is the struct fieldname for the top level tab.
-            tabs.Cases  = {'   Cases  ',@obj.refresh};        % << Edit tabs to suit model 
+            tabs.Cases  = {'   Cases  ',@obj.refresh};        
             tabs.Inputs = {'  Inputs  ',@obj.InputTabSummary};
             tabs.Form = {'   Form   ',@obj.getFormPlot};
             tabs.xPlot   = {'  X-Plot  ',@obj.getTabData};
@@ -154,11 +155,10 @@ classdef CSTmodel < muiModelUI
             % position and column widths vary with number of parameters
             % (rows) and width of input text and values. Inidcative
             % positions:  top left [0.95,0.48];    top right [0.95,0.97]
-            %         bottom left [0.45, 0.48]; bottom rigth [0.45,0.97]
-                                                             % << Edit input properties classnames 
-            props = {...                                     % << Add additional inputs and adjust layout
-                'CSTparameters','Inputs',[0.95,0.48],{180,60},'Input parameters:';...
-                'CSTrunparams','Inputs',[0.95,0.95],{180,60},'Run parameters:'};
+            %         bottom left [0.45, 0.48]; bottom rigth [0.45,0.97]                                                       
+            props = {...                                    
+                'CSTparameters','Inputs',[0.95,0.6],{220,120},'Input parameters:';...
+                'CSTrunparams','Inputs',[0.95,0.97],{150,60},'Run parameters:'};
         end    
  %%
         function setTabAction(obj,src,cobj)
@@ -259,7 +259,12 @@ classdef CSTmodel < muiModelUI
 
         %% Help menu ------------------------------------------------------
         function Help(~,~,~)
-            doc cstmodel                              
+            switch src.Text
+                case 'Documentation'
+                    doc cstmodel
+                case 'Manual'
+                    cst_open_manual;
+            end                              
         end
 
         %% Check that toolboxes are installed------------------------------

@@ -89,7 +89,7 @@ classdef CSTformprops < handle
             end 
             %
             inpobj = getClassObj(mobj,'Inputs','CSTparameters');
-            if ~isempty(inpobj)
+            if ~isempty(inpobj) && ~isempty(inpobj.AreaELength)
                 %plot model form based on CSTparameters
                 Le = inpobj.EstuaryLength;   %estuary length (m)   
                 Wm = inpobj.MouthWidth;      %width at mouth (m)
@@ -132,7 +132,11 @@ classdef CSTformprops < handle
             ylabel('Mannings N');
             xlabel('Distance from mouth (m)'); 
             legend
-            sgtitle('Estuary Form Properties');             
+            if isempty(dst)
+                sgtitle('Modelled Estuary Form Properties','FontSize',10);
+            else
+                sgtitle(sprintf('Estuary Form Properties\nFile: %s',(dst.Source{1})),'FontSize',10); 
+            end           
         end     
     end
 %%

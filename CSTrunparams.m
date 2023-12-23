@@ -21,7 +21,8 @@ classdef CSTrunparams < muiPropertyUI
         %abstract properties in muiPropertyUI to define input parameters
         PropertyLabels = {'Time increment (hr)'...
                           'Distance increment (m)',...
-                          'Use observed form, true/false'};
+                          'Use observed form, (0/1)',...
+                          'Output all properties, (0/1)'};
         %abstract properties in muiPropertyUI for tab display
         TabDisplay   %structure defines how the property table is displayed 
     end
@@ -30,6 +31,7 @@ classdef CSTrunparams < muiPropertyUI
         TimeInt = 0.5   %time increment in analytical model (hrs)
         DistInt = 5000  %distance increment along estuary (m) 
         useObs = false  %flag to indicate whether to use 
+        isfull = false  %flag to include all model properties in output
     end    
 
 %%   

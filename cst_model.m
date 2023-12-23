@@ -106,7 +106,7 @@ function [resX,xdim,resXT,time] = cst_model(inp,rnp,est)
         if isempty(rs) || isempty(Ks), return; end
     end
     h0 = A./B;
-    h = h0';
+    h = h0'; Ax = A;
     %allocate space for variables
     Xi = zeros(length(x),1);
     eta = Xi; f = Xi; chi = Xi; mu = Xi; delta = Xi; lambda = Xi; 
@@ -310,7 +310,7 @@ end
     At = diag(A')*I+ht.*(diag(B)*I+diag(msx)*ht); %area over tidal cycle
     urt = diag(urx.*A')*I./At; %river velocity scaled for tidal elevation
     ust = utt.^2./(diag(c)*I);  %Stokes drift velocity as a function of x and t
-%     usx = Ux.^2/2./c0;         %estimate of the tidal_av Stoke's drift velocity
+    usx = Ux.^2/2./c0;         %estimate of the tidal_av Stoke's drift velocity
 
     ut0=utt;
     ust0=utt;
@@ -336,6 +336,16 @@ end
     resXT{2} = utt';    %tidal velocity over tidal cycle
     resXT{3} = urt';    %river velocity scaled for tidal elevation
     resXT{4} = ust';    %Stokes drift velocity as a function of x and t
+
+    if rnp.isfull
+        %variables in x
+        resX{6} = eA';    %phase angle between elevation and velocity       
+        resX{7} = Ax;    %cross-sectional area at mtl (m^2)
+        resX{8} = B;      %width at mtl (m)
+        resX{9} = msx;    %intertidal slope (1:m)
+        resX{10} = A';    %effective hydrualic CSA (this is A_Qf above)
+        resX{11} = usx';  %estimate of Stokes drift over tidal cycle 
+    end
 end
 %%
 function outVar = interpChannelVar(inVar,xsw,Le,x)
