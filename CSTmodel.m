@@ -166,10 +166,8 @@ classdef CSTmodel < muiModelUI
             %tab (src)
             msg = 'No results to display';
             switch src.Tag                                   
-                case 'xPlot' 
+                case {'xPlot','xtPlot'}
                      tabPlot(cobj,src);
-                case 'xtPlot'
-                     xt_tabPlot(cobj,src);
                 case 'Stats'
                     lobj = getClassObj(obj,'mUI','Stats',msg);
                     if isempty(lobj), return; end

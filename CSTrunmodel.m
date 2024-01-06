@@ -113,15 +113,53 @@ classdef CSTrunmodel < muiDataSet
             %used in CSTdataimport to access tab plotting functions
             obj = CSTrunmodel;
         end
+        
     end
 %%
     methods
         function tabPlot(obj,src) %abstract class for muiDataSet
             %generate plot for display on Q-Plot tab 
-            tabcb =  @(src,evdat)tabPlot(obj,src);
-            ax = tabfigureplot(obj,src,tabcb,false); %rotate button not required
-            channelOuputPlot(obj,ax);
+            switch src.Tag
+                case 'xPlot'
+                    tabcb =  @(src,evdat)tabPlot(obj,src);
+                    ax = tabfigureplot(obj,src,tabcb,false); %rotate button not required
+                    channelOuputPlot(obj,ax);
+                case 'xtPlot'
+                    xt_tabPlot(obj,src) 
+            end            
         end
+
+    end 
+%%    
+    methods (Access = private)
+        function channelOuputPlot(obj,ax)
+            %default graphic for X-Plot tab or stand-alone figure
+            dst = obj.Data.AlongEstuaryValues;
+            x = dst.Dimensions.X; 
+            z = dst.MeanTideLevel;  %mean tide level
+            a = dst.TidalElevAmp;   %tidal amplitude
+			U = dst.TidalVelAmp;    %tidal velocity amplitude
+			v = dst.RiverVel;       %river velocity 
+			d = dst.HydDepth;       %hydraulic depth
+            %gerenate plot
+            yyaxis left
+            plot(x,z,'-r','DisplayName','MTL'); %plot time v elevation
+            hold on
+            plot(x,(z+a),'-.b','DisplayName','HWL')%plot high water level
+            plot(x,(z-a),'-.b','DisplayName','LWL')%plot low water level
+			plot(x,(z-d),'-k','DisplayName','Hydraulic depth')%hydraulic depth below mean tide level
+            ylabel('Elevation (mOD)'); 
+			yyaxis right
+			plot(x,U,'--','Color',mcolor('orange'),'DisplayName','Tidal velocity')%plot tidal velocity
+			plot(x,v,'--','Color',mcolor('green'),'DisplayName','River velocity') %plot river velocity
+            hold off
+            xlabel('Distance from mouth (m)'); 
+            ylabel('Velocity (m/s)'); 
+			legend('Location','best');			
+            title ('Along channel variation');
+            ax.Color = [0.96,0.96,0.96];  %needs to be set after plo
+        end
+
 %%
         function xt_tabPlot(obj,src) 
             %generate plot for display on xt-Plot tab
@@ -178,9 +216,8 @@ classdef CSTrunmodel < muiDataSet
             obj.ModelMovie = Mframes;
             hold(ax,'off')
         end
-    end 
-%%    
-    methods (Access = private)
+
+%%
         function pinput = getPlotInput(~,dst,ptype,jxt)
             %get the variables for the selected x or t value
             h = dst.Elevation;
@@ -199,6 +236,7 @@ classdef CSTrunmodel < muiDataSet
                 pinput.s = s(:,jxt);
             end            
         end
+
 %%
         function hp = setDataSources(~,ax)
             %set the source variables to be used for each plot line
@@ -212,6 +250,7 @@ classdef CSTrunmodel < muiDataSet
             hp(2).YDataSource = 'pinput.v'; 
             hp(1).YDataSource = 'pinput.s'; 
         end
+
 %%
         function setPlot(~,ax,xax,pin,plabels)
             %generate the plot for selected subset of x-t data            
@@ -229,34 +268,7 @@ classdef CSTrunmodel < muiDataSet
             xlabel(plabels.x)
             title(plabels.title)
         end
-%%
-        function channelOuputPlot(obj,ax)
-            %default graphic for X-Plot tab or stand-alone figure
-            dst = obj.Data.AlongEstuaryValues;
-            x = dst.Dimensions.X; 
-            z = dst.MeanTideLevel;  %mean tide level
-            a = dst.TidalElevAmp;   %tidal amplitude
-			U = dst.TidalVelAmp;    %tidal velocity amplitude
-			v = dst.RiverVel;       %river velocity 
-			d = dst.HydDepth;       %hydraulic depth
-            %gerenate plot
-            yyaxis left
-            plot(x,z,'-r','DisplayName','MTL'); %plot time v elevation
-            hold on
-            plot(x,(z+a),'-.b','DisplayName','HWL')%plot high water level
-            plot(x,(z-a),'-.b','DisplayName','LWL')%plot low water level
-			plot(x,(z-d),'-k','DisplayName','Hydraulic depth')%hydraulic depth below mean tide level
-            ylabel('Elevation (mOD)'); 
-			yyaxis right
-			plot(x,U,'--','Color',mcolor('orange'),'DisplayName','Tidal velocity')%plot tidal velocity
-			plot(x,v,'--','Color',mcolor('green'),'DisplayName','River velocity') %plot river velocity
-            hold off
-            xlabel('Distance from mouth (m)'); 
-            ylabel('Velocity (m/s)'); 
-			legend('Location','best');			
-            title ('Along channel variation');
-            ax.Color = [0.96,0.96,0.96];  %needs to be set after plo
-        end
+
 %%
         function setYaxisLimits(~,ax,dst)
             %set the Y axis limits so they do not change when plot updated
@@ -276,6 +288,7 @@ classdef CSTrunmodel < muiDataSet
             yyaxis right         %fix right y-axis limits
             ax.YLim = [lim3,lim4];
         end  
+
 %%
         function hm = setSlideControl(obj,hfig,ptype,svar,dst,stxt)
             %intialise slider to set different Q values   
@@ -292,7 +305,8 @@ classdef CSTrunmodel < muiDataSet
             invar.butxt =  'Save';    %text for button if included
             invar.butcback = @(src,evt)saveanimation2file(obj.ModelMovie,src,evt); %callback for button
             hm = setfigslider(hfig,invar);   
-        end         
+        end      
+
 %%
         function updateXTplot(obj,ptype,src,~)
             %use the updated slider value to adjust the CST plot
@@ -326,6 +340,7 @@ classdef CSTrunmodel < muiDataSet
             refreshdata(hp,'caller');
             drawnow;
         end
+
 %%
         function [dsp1,dsp2,dsp3] = modelDSproperties(~) 
             %define a dsproperties struct and add the model metadata
