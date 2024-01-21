@@ -117,11 +117,11 @@ classdef CSTrunmodel < muiDataSet
     end
 %%
     methods
-        function tabPlot(obj,src) %abstract class for muiDataSet
+        function tabPlot(obj,src,mobj) %abstract class for muiDataSet
             %generate plot for display on Q-Plot tab 
             switch src.Tag
-                case 'xPlot'
-                    tabcb =  @(src,evdat)tabPlot(obj,src);
+                case {'xPlot','FigButton'}
+                    tabcb =  @(src,evdat)tabPlot(obj,src,mobj);
                     ax = tabfigureplot(obj,src,tabcb,false); %rotate button not required
                     channelOuputPlot(obj,ax);
                 case 'xtPlot'
