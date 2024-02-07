@@ -165,13 +165,15 @@ classdef CSTmodel < muiModelUI
             %function required by muiModelUI and sets action for selected
             %tab (src)
             msg = 'No results to display';
-            switch src.Tag                                   
+            switch src.Tag
                 case {'xPlot','xtPlot'}
-                     tabPlot(cobj,src,obj);
+                    valid = {'CSTrunmodel','CSTdataimport'};
+                    if ~any(matches(valid,class(obj))), return; end
+                    tabPlot(cobj,src,obj);
                 case 'Stats'
                     lobj = getClassObj(obj,'mUI','Stats',msg);
                     if isempty(lobj), return; end
-                    tabStats(lobj,src);   
+                    tabStats(lobj,src);
             end
         end    
 %%
@@ -256,7 +258,8 @@ classdef CSTmodel < muiModelUI
         end
 
         %% Help menu ------------------------------------------------------
-        function Help(~,~,~)
+        function Help(~,src,~)
+            %menu to access online documentation and manual pdf file
             switch src.Text
                 case 'Documentation'
                     doc cstmodel

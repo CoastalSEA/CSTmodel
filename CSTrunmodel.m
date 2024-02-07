@@ -101,8 +101,8 @@ classdef CSTrunmodel < muiDataSet
             dst2.Source = metaclass(obj).Name;
 %             dst2.MetaData = 'Any additional information to be saved';
             
-            dst.AlongEstuaryValues = dst1;
-            dst.TidalCycleValues = dst2;            
+            dst.AlongEstuary = dst1;
+            dst.TidalCycle = dst2;            
             %save results
             setDataSetRecord(obj,muicat,dst,'model');
             getdialog('Run complete');
@@ -118,7 +118,7 @@ classdef CSTrunmodel < muiDataSet
 %%
     methods
         function tabPlot(obj,src,mobj) %abstract class for muiDataSet
-            %generate plot for display on Q-Plot tab 
+            %generate plot for display on Q-Plot tab             
             switch src.Tag
                 case {'xPlot','FigButton'}
                     tabcb =  @(src,evdat)tabPlot(obj,src,mobj);

@@ -83,7 +83,7 @@ classdef CSTdataimport < muiDataSet
     end
 %%
     methods
-        function tabPlot(obj,src)
+        function tabPlot(obj,src,~)
             %generate plot for display on Q-Plot tab
             if strcmp(src.Tag,'FigButton')
                 hfig = figure('Tag','PlotFig');
