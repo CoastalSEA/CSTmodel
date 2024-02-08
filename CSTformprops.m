@@ -135,7 +135,8 @@ classdef CSTformprops < handle
             if isempty(dst)
                 sgtitle('Modelled Estuary Form Properties','FontSize',10);
             else
-                sgtitle(sprintf('Estuary Form Properties\nFile: %s',(dst.Source{1})),'FontSize',10); 
+                sgtitle(sprintf('Estuary Form Properties\nFile: %s',...
+                        dst.Source{1}),'Interpreter','none','FontSize',10); 
             end           
         end     
     end

@@ -74,7 +74,8 @@
 % * *Statistics*: initialiss the Statistics UI to select data and run a range of standard statistical methods.
 
 %% Help
-% * *Help*: access the online documentation for CoastalTools.
+% * *Help>Documentation*: access the online documentation for CSTmodel.
+% * *Help>Manual*: access the manual pdf file.
 
 %% See Also
 % The <matlab:cst_open_manual manual> provides further details of setup and 

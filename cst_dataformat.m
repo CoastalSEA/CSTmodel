@@ -45,7 +45,7 @@ function dst = getData(obj,filename)
     if isempty(dataX), dst = []; return; end
     
     %set metadata
-    [dsp1,dsp2,dsp3] = setDSproperties;
+    [dsp1,dsp2] = setDSproperties;
     
     %each variable should be an array in the 'results' cell array
     %if model returns single variable as array of doubles, use {results}
@@ -56,7 +56,7 @@ function dst = getData(obj,filename)
     dst.AlongEstuary = dst1;
     
     if ~isempty(dataHT) && ~isempty(dataUT)
-        input = {dataHR,dataUT};
+        input = {dataHT,dataUT};
         dst2 = dstable(input{:},'RowNames',hours(t.h),'DSproperties',dsp2);
         dst2.Dimensions.X = x;     %grid x-coordinate   
         dst2.MetaData = metaclass(obj).Name; %Any additional information to be saved';    
@@ -73,7 +73,7 @@ end
 %%
 function [dataX,dataHT,dataUT,x,t] = readInputData(filename)
     %default is to load the along channel data (MSL,z-amp,u-amp,depth)    
-    dataSpec = '%f %f %f %f %f'; 
+    dataSpec = '%f %f %f %f %f %f'; 
     [data,~] = readinputfile(filename,1,dataSpec); %in dsfunctions
     if isempty(data), return; end
     x = data{1};
@@ -106,7 +106,7 @@ end
 %--------------------------------------------------------------------------
 % dataDSproperties
 %--------------------------------------------------------------------------
-function [dsp1,dsp2,dsp3] = setDSproperties(~) 
+function [dsp1,dsp2] = setDSproperties(~) 
     %define a dsproperties struct and add the model metadata
     dsp1 = struct('Variables',[],'Row',[],'Dimensions',[]); 
     dsp2 = dsp1; dsp3 = dsp1;

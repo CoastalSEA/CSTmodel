@@ -168,7 +168,7 @@ classdef CSTmodel < muiModelUI
             switch src.Tag
                 case {'xPlot','xtPlot'}
                     valid = {'CSTrunmodel','CSTdataimport'};
-                    if ~any(matches(valid,class(obj))), return; end
+                    if ~any(matches(valid,class(cobj))), return; end
                     tabPlot(cobj,src,obj);
                 case 'Stats'
                     lobj = getClassObj(obj,'mUI','Stats',msg);
