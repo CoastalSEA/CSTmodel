@@ -181,9 +181,9 @@ function hm = setSlideControl(obj,hfig,ptype,svar,dst,stxt)
     invar = struct('sval',[],'smin',[],'smax',[],'size', [],...
                    'callback','','userdata',[],'position',[],...
                    'stxext','','butxt','','butcback','');            
-    invar.sval = svar(1);      %initial value for slider 
-    invar.smin = svar(1);     %minimum slider value
-    invar.smax = svar(end);     %maximum slider value
+    invar.smin = min(svar);    %minimum slider value
+    invar.smax = max(svar);    %maximum slider value
+    invar.sval = invar.smin;   %initial value for slider 
     invar.callback = @(src,evt)updateXTplot(obj,ptype,src,evt); %callback function for slider to use
     invar.userdata = dst;  %pass userdata if required 
     invar.position = [0.15,0.005,0.60,0.04]; %position of slider

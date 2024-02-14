@@ -56,9 +56,8 @@ classdef CSTrunmodel < muiDataSet
             %input parameters for model
             inpobj = getClassObj(mobj,'Inputs','CSTparameters');
             rnpobj = getClassObj(mobj,'Inputs','CSTrunparams');
-            estobj = getClassObj(mobj,'Inputs','CSTformprops');  %can be empty
-            if ~isempty(estobj)
-                activatedynamicprops(estobj.FormData); %ensures variables are active
+            if rnpobj.useObs
+                estobj = getObserevedForm(obj,mobj);
             end
             %
             try
@@ -72,8 +71,9 @@ classdef CSTrunmodel < muiDataSet
                 return;
             end
             %
-            if isempty(resX), return; end  %probable error in data input
-            
+            if isempty(resX)
+                warndlg('No solution found in cst_model'); return; %probable error in data input
+            end  
             %now assign results to object properties  
             modeltime = seconds(mtime{1});  %durataion data for rows 
             modeltime.Format = 'h';
@@ -132,6 +132,38 @@ classdef CSTrunmodel < muiDataSet
     
 %%    
     methods (Access = private)
+        function estobj =  getObserevedForm(obj,mobj)
+            %
+            estobj = getClassObj(mobj,'Inputs','CSTformprops');  %can be empty
+            if ~isempty(estobj)
+                activatedynamicprops(estobj.FormData); %ensures variables are active
+            end
+            impobj = getClassObj(mobj,'Cases','CSTdataimport');  %can be empty
+
+            if isempty(estobj) && isempty(impobj)
+                warndlg('No data loaded');
+            elseif ~isempty(impobj) && isempty(estobj)
+                estobj = userSelection(obj,mobj,impobj);
+            elseif ~isempty(estobj) && ~isempty(impobj)
+                answer = questdlg('Use Estuary properties or Data import?',...
+                              'Form plot','Properties','Import','Properties');
+                if strcmp(answer,'Import')
+                    estobj = userSelection(obj,mobj,impobj);
+                end
+            end
+        end
+
+%%
+function estobj = userSelection(~,mobj,impobj)
+            %prompt user to select from the available data import cases
+            if length(impobj)==1, estobj = impobj.Data; return; end
+            %select from data import
+            promptxt = 'Select case to use:';
+            [lobj,~] = selectCaseObj(mobj.Cases,[],{'CSTdataimport'},promptxt);
+            estobj = lobj.Data;
+        end
+        
+%%
         function [dsp1,dsp2,dsp3] = modelDSproperties(~) 
             %define a dsproperties struct and add the model metadata
             dsp1 = struct('Variables',[],'Row',[],'Dimensions',[]); 

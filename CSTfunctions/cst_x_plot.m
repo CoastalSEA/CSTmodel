@@ -21,7 +21,7 @@ function cst_x_plot(obj,ax)
 % CoastalSEA (c) Feb 2024
 %-------------------------------------------------------------------------
 %
-    dst = obj.Data.AlongEstuary;
+    dst = getHydroData(obj);
     x = dst.Dimensions.X; 
     z = dst.MeanTideLevel;  %mean tide level
     a = dst.TidalElevAmp;   %tidal amplitude
@@ -46,4 +46,17 @@ function cst_x_plot(obj,ax)
     title ('Along channel variation');
     subtitle(sprintf('Case: %s',dst.Description));
     ax.Color = [0.96,0.96,0.96];  %needs to be set after plo
+end
+%%
+function dst = getHydroData(obj)
+    %extract data from source depending on class type
+    if isa(obj,'CSTrunmodel')
+        dst = obj.Data.AlongEstuary;
+    elseif isa(obj,'CSTdataimport')
+        Hmtl = obj.Data.FormData.Hmtl;
+        dst1 = obj.Data.AlongEstuary;
+        dst = addvars(dst1,Hmtl','NewVariableNames','HydDepth');
+    else
+        warndlg('Class not recognised')
+    end
 end

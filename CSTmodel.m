@@ -180,11 +180,21 @@ classdef CSTmodel < muiModelUI
         function getFormPlot(obj,src,~)
             %plot the estuary form properties
             cobj = getClassObj(obj,'Inputs','CSTformprops');
-            if isempty(cobj)
+            dobj = getClassObj(obj,'Cases','CSTdataimport');
+            if isempty(cobj) && isempty(dobj)
                 cobj = CSTformprops();
+            elseif ~isempty(dobj) && isempty(cobj)
+                %select from data import
+                cobj = userSelection(obj,dobj);
+            elseif ~isempty(cobj) && ~isempty(dobj)
+                answer = questdlg('Use Estuary properties or Data import?',...
+                              'Form plot','Properties','Import','Properties');
+                if strcmp(answer,'Import')
+                    cobj = userSelection(obj,dobj);
+                end
             end
             if isempty(cobj), return; end
-            tabPlot(cobj,src,obj);
+            cst_formplot(cobj,src,obj);
         end
 %% ------------------------------------------------------------------------
 % Callback functions used by menus and tabs
@@ -224,8 +234,17 @@ classdef CSTmodel < muiModelUI
             classname = 'CSTdataimport';
             switch src.Text
                 case 'Load'
-                    fname = sprintf('%s.loadData',classname);
-                    callStaticFunction(obj,classname,fname); 
+                    %relace callStaticFunction because need mobj as well as
+                    %muicat in CSTdataimport
+                    fncname = sprintf('%s.loadData',classname);
+                    heq = str2func(['@(mcat,cname) ',[fncname,'(mcat,cname)']]); 
+                    try
+                       heq(obj,classname); 
+                    catch ME
+                        msg = sprintf('Unable to run function %s\nID: ',fncname);
+                        disp([msg, ME.identifier])
+                        rethrow(ME)                     
+                    end
                 case 'Add'
                     useCase(obj.Cases,'single',{classname},'addData');
                 case 'Delete'
@@ -289,7 +308,17 @@ classdef CSTmodel < muiModelUI
             else
                 isok = true;
             end
-        end        
+        end    
+
+        %%user form data tabPlot selection---------------------------------
+        function cobj = userSelection(obj,dobj)
+            %prompt user to select from the available data import cases
+            if length(dobj)==1, cobj = dobj.Data; return; end
+            %select from data import
+            promptxt = 'Select case to use:';
+            [lobj,~] = selectCaseObj(obj.Cases,[],{'CSTdataimport'},promptxt);
+            cobj = lobj.Data;
+        end
     end
 end    
     

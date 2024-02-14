@@ -69,29 +69,35 @@ function [resX,xdim,resXT,time] = cst_model(inp,rnp,est)
     Qr = inp.RiverDischarge;  %river discharge (m^3/s) +ve downstream
     zw0 = inp.MTLatMouth;     %MTL at mouth (allows slr to be added)
     %
-    dt = rnp.TimeInt*3600;  %time increment in analytical model
-    dx = rnp.DistInt;       %distance increment along estuary
+    dt = rnp.TimeInt*3600;    %time increment in analytical model
+    dx = rnp.DistInt;         %distance increment along estuary
 
     %initialise space and time dimensions and x-t output variables
-    xint = ceil(Le/dx); %ensure x is an exact number of intervals of delX
+    xint = ceil(Le/dx);   %ensure x is an exact number of intervals of delX
     x = 0:dx:(xint*dx);
-    tint = ceil(T/dt);  %ensure t is an exact number of intervals of delT
+    tint = ceil(T/dt);    %ensure t is an exact number of intervals of delT
     t = 0:dt:(tint*dt);
     ht = zeros(length(x),length(t)); 
     utt = ht;
     xi = diag(x)*ones(size(ht)); 
     ti = ones(size(ht))*diag(t);
     Qf = ones(size(x))*Qr;
-    w = 2*pi()/T;             %wave frequency (1/s)
+    w = 2*pi()/T;                             %wave frequency (1/s)
     
     %initialise estuary form properties
     if rnp.useObs && ~isempty(est)
-        dst = est.FormData;           %table of observed/loaded form data
+        dst = est.FormData;                   %table of observed/loaded form data
+        if any(strcmp(dst.VariableNames,'Hmtl')) && ... %not defined in file - loaded as NaN
+                                (sum(dst.Hmtl)>0 || all(isnan(dst.Hmtl))) 
+            Wmtl = dst.Amtl./dst.Hmtl;        %user defined
+        else
+            Wmtl = dst.Wlw+(dst.Whw-dst.Wlw)/2.57; %assume F&A ideal profile
+        end
         Ximp = dst.Dimensions.X;
         A = interp1(Ximp,dst.Amtl,x,'pchip');
-        B = interp1(Ximp,(dst.Whw+dst.Wlw)/2,x,'pchip');    %width at mean tide level
+        B = interp1(Ximp,Wmtl,x,'pchip');     %width at mean tide level
         rs = interp1(Ximp,dst.Whw./dst.Wlw,x,'pchip');       %storage ratio
-        if all(isnan(dst.N))%not defined in file - loaded as NaN
+        if all(isnan(dst.N))                  %not defined in file - loaded as NaN
             Ks = interpChannelVar(kM,xsw,Le,x);
             if isempty(Ks), return; end
         else
