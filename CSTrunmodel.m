@@ -57,18 +57,20 @@ classdef CSTrunmodel < muiDataSet
             inpobj = getClassObj(mobj,'Inputs','CSTparameters');
             rnpobj = getClassObj(mobj,'Inputs','CSTrunparams');
             if rnpobj.useObs
-                estobj = getObserevedForm(obj,mobj);
+                estobj = getObservedForm(obj,mobj);
+            else
+                estobj = [];
             end
             %
             try
                 [resX,xy,resXT,mtime] = cst_model(inpobj,rnpobj,estobj);
-            catch
+            catch ME
                 %remove the waitbar if program did not complete
                 hw = findall(0,'type','figure','tag','TMWWaitbar');
                 delete(hw);
                 warndlg('No solution found in cst_model');
                 delete(obj);
-                return;
+                throw(ME)
             end
             %
             if isempty(resX)
@@ -101,8 +103,8 @@ classdef CSTrunmodel < muiDataSet
             dst2.Source = metaclass(obj).Name;
 %             dst2.MetaData = 'Any additional information to be saved';
             
-            dst.AlongEstuary = dst1;
-            dst.TidalCycle = dst2;            
+            dst.AlongChannelHydro = dst1;
+            dst.TidalCycleHydro = dst2;            
             %save results
             setDataSetRecord(obj,muicat,dst,'model');
             getdialog('Run complete');
@@ -132,7 +134,7 @@ classdef CSTrunmodel < muiDataSet
     
 %%    
     methods (Access = private)
-        function estobj =  getObserevedForm(obj,mobj)
+        function estobj =  getObservedForm(obj,mobj)
             %
             estobj = getClassObj(mobj,'Inputs','CSTformprops');  %can be empty
             if ~isempty(estobj)

@@ -61,14 +61,14 @@ function dst = getData(obj,filename)
     dst1 = dstable(dataX{:},'DSproperties',dsp1);
     dst1.Dimensions.X = x;     %grid x-coordinate
     dst1.MetaData = metaclass(obj).Name; %Any additional information to be saved';
-    dst.AlongEstuary = dst1;
+    dst.AlongChannelHydro = dst1;
     
     if ~isempty(dataHT) && ~isempty(dataUT)
         input = {dataHT,dataUT};
         dst2 = dstable(input{:},'RowNames',hours(t.h),'DSproperties',dsp2);
         dst2.Dimensions.X = x;     %grid x-coordinate   
         dst2.MetaData = metaclass(obj).Name; %Any additional information to be saved';    
-        dst.TidalCycle = dst2; 
+        dst.TidalCycleHydro = dst2; 
     end
 end
 %%

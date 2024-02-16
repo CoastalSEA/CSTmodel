@@ -23,8 +23,8 @@ function cst_xt_plot(obj,src)
 %-------------------------------------------------------------------------
 %
     setnames = fieldnames(obj.Data);
-    if any(strcmp(setnames,'TidalCycle'))
-        dst = obj.Data.TidalCycle;
+    if any(strcmp(setnames,'TidalCycleHydro'))
+        dst = obj.Data.TidalCycleHydro;
         if ~isprop(dst,'Elevation')
         dst = activatedynamicprops(dst);
         end

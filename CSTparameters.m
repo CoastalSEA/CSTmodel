@@ -76,9 +76,29 @@ classdef CSTparameters < muiPropertyUI
                 obj = editProperties(obj,14);  
                 %add any additional manipulation of the input here
             end
+            checkDistanceVectors(obj);
+
             setClassObj(mobj,'Inputs',classname,obj);
         end     
     end
-%%        
+
+%%
+    methods (Access=private)
+        function checkDistanceVectors(obj)
+            %check that Manning and Storage ratio vectors are correct length
+            xlen = length(obj.xTideRiver);
+            nlen = length(obj.Manning);
+            rlen = length(obj.StorageRatio);
+
+            if nlen~=xlen+2
+                warndlg(sprintf('For %d distances needs %d Manning N, not %d',xlen,xlen+2,nlen))
+            end
+
+            if rlen~=xlen+2
+                warndlg(sprintf('For %d distances needs %d Storage ratio, not %d',xlen,xlen+2,rlen))
+            end
+        end
+    end
+%%           
         %add other functions to operate on properties as required   
 end

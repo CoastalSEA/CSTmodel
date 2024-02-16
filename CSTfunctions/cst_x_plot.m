@@ -51,10 +51,10 @@ end
 function dst = getHydroData(obj)
     %extract data from source depending on class type
     if isa(obj,'CSTrunmodel')
-        dst = obj.Data.AlongEstuary;
+        dst = obj.Data.AlongChannelHydro;
     elseif isa(obj,'CSTdataimport')
         Hmtl = obj.Data.FormData.Hmtl;
-        dst1 = obj.Data.AlongEstuary;
+        dst1 = obj.Data.AlongChannelHydro;
         dst = addvars(dst1,Hmtl','NewVariableNames','HydDepth');
     else
         warndlg('Class not recognised')
