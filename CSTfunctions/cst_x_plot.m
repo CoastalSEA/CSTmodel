@@ -55,7 +55,7 @@ function dst = getHydroData(obj)
     elseif isa(obj,'CSTdataimport')
         Hmtl = obj.Data.FormData.Hmtl;
         dst1 = obj.Data.AlongChannelHydro;
-        dst = addvars(dst1,Hmtl','NewVariableNames','HydDepth');
+        dst = addvars(dst1,Hmtl,'NewVariableNames','HydDepth');
     else
         warndlg('Class not recognised')
     end

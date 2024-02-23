@@ -55,9 +55,7 @@ function dst = getData(obj,filename)
     %set metadata
     [dsp1,dsp2] = setDSproperties;
     
-    %each variable should be an array in the 'results' cell array
-    %if model returns single variable as array of doubles, use {results}
-    dataX = cellfun(@transpose,dataX,'UniformOutput',false);
+    %assign along channel data to struct
     dst1 = dstable(dataX{:},'DSproperties',dsp1);
     dst1.Dimensions.X = x;     %grid x-coordinate
     dst1.MetaData = metaclass(obj).Name; %Any additional information to be saved';
