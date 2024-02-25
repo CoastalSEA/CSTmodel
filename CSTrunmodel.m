@@ -147,9 +147,9 @@ classdef CSTrunmodel < muiDataSet
             elseif ~isempty(impobj) && isempty(estobj)
                 estobj = userSelection(obj,mobj,impobj);
             elseif ~isempty(estobj) && ~isempty(impobj)
-                answer = questdlg('Use Estuary properties or Data import?',...
-                              'Form plot','Properties','Import','Properties');
-                if strcmp(answer,'Import')
+                answer = questdlg('Use Imported properties or Observed data?',...
+                              'CSTmodel','Imported','Observed','Imported');
+                if strcmp(answer,'Observed')
                     estobj = userSelection(obj,mobj,impobj);
                 end
             end

@@ -94,14 +94,14 @@ function [resX,xdim,resXT,time] = cst_model(inp,rnp,est)
             Wmtl = dst.Wlw+(dst.Whw-dst.Wlw)/2.57; %assume F&A ideal profile
         end
         Ximp = dst.Dimensions.X;
-        A = interp1(Ximp,dst.Amtl,x,'pchip');
-        B = interp1(Ximp,Wmtl,x,'pchip');     %width at mean tide level
-        rs = interp1(Ximp,dst.Whw./dst.Wlw,x,'pchip');       %storage ratio
+        A = fitChannelVar(Ximp,dst.Amtl,x,Ao,Ar);
+        B = fitChannelVar(Ximp,Wmtl,x,Bo,Br);%width at mean tide level
+        rs = fitChannelVar(Ximp,dst.Whw./dst.Wlw,x,dst.Whw(1)./dst.Wlw(1),1);%storage ratio
         if all(isnan(dst.N))                  %not defined in file - loaded as NaN
             Ks = interpChannelVar(kM,xsw,Le,x);
             if isempty(Ks), return; end
         else
-            Ks = interp1(Ximp,dst.N,x);       %Manning coefficient
+            Ks = fitChannelVar(Ximp,dst.N,x,dst.N(1),dst.N(end)); %Manning coefficient
         end
     else
         % compute default area, width and depth values
@@ -371,7 +371,22 @@ function outVar = interpChannelVar(inVar,xsw,Le,x)
         outVar = inVar;
     end       
 end
+%%
+function newVar = fitChannelVar(xin,Var,x,Vmouth,Vhead)
+    %interpolate the observed data after checking that data spans channel
+    if min(xin)>0
+        Var = [Vmouth,Var];
+        xin = [0;xin];
+    end
+
+    if max(xin)<x(end)
+        Var = [Var,Vhead];
+        xin = [xin;x(end)];
+    end
     
-    
+    newVar = interp1(xin,Var,x,'pchip');
+
+    newVar = smoothdata(newVar);
+end
     
     
