@@ -73,7 +73,7 @@ classdef CSTdataimport < muiDataSet
             if ok<1 || isempty(dst), return; end
             %assign metadata about data, Note dst can be a struct
             dst = updateSource(dst,filename,1);
-            dst.FormData = FormData;
+            dst.AlongChannelForm = FormData;
 
             setDataSetRecord(obj,mobj.Cases,dst,'data');
             getdialog(sprintf('Data loaded in class: %s',classname));

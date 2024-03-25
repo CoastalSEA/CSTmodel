@@ -53,7 +53,7 @@ function dst = getHydroData(obj)
     if isa(obj,'CSTrunmodel')
         dst = obj.Data.AlongChannelHydro;
     elseif isa(obj,'CSTdataimport')
-        Hmtl = obj.Data.FormData.Hmtl;
+        Hmtl = obj.Data.AlongChannelForm.Hmtl;
         dst1 = obj.Data.AlongChannelHydro;
         dst = addvars(dst1,Hmtl,'NewVariableNames','HydDepth');
     else

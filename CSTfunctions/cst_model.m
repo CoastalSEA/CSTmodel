@@ -82,20 +82,20 @@ function [resX,xdim,resXT,time] = cst_model(inp,rnp,est)
     xi = diag(x)*ones(size(ht)); 
     ti = ones(size(ht))*diag(t);
     Qf = ones(size(x))*Qr;
-    w = 2*pi()/T;                             %wave frequency (1/s)
+    w = 2*pi()/T;         %wave frequency (1/s)
     
     %initialise estuary form properties
     if rnp.useObs && ~isempty(est)
-        dst = est.FormData;                   %table of observed/loaded form data
+        dst = est.AlongChannelForm;                     %table of observed/loaded form data
         if any(strcmp(dst.VariableNames,'Hmtl')) && ... %not defined in file - loaded as NaN
                                 (sum(dst.Hmtl)>0 || all(isnan(dst.Hmtl))) 
-            Wmtl = dst.Amtl./dst.Hmtl;        %user defined
+            Wmtl = dst.Amtl./dst.Hmtl;                  %user defined
         else
-            Wmtl = dst.Wlw+(dst.Whw-dst.Wlw)/2.57; %assume F&A ideal profile
+            Wmtl = dst.Wlw+(dst.Whw-dst.Wlw)/2.57;      %assume F&A ideal profile
         end
         Ximp = dst.Dimensions.X;
         A = fitChannelVar(Ximp,dst.Amtl,x,Ao,Ar);
-        B = fitChannelVar(Ximp,Wmtl,x,Bo,Br);%width at mean tide level
+        B = fitChannelVar(Ximp,Wmtl,x,Bo,Br); %width at mean tide level
         rs = fitChannelVar(Ximp,dst.Whw./dst.Wlw,x,dst.Whw(1)./dst.Wlw(1),1);%storage ratio
         if all(isnan(dst.N))                  %not defined in file - loaded as NaN
             Ks = interpChannelVar(kM,xsw,Le,x);
