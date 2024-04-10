@@ -1,4 +1,4 @@
-function [resX,xdim,resXT,time] = cst_model(inp,rnp,est)
+function [res,xdim,time] = cst_model(inp,rnp,est)
 %
 %------ function help------------------------------------------------------
 % NAME
@@ -13,19 +13,34 @@ function [resX,xdim,resXT,time] = cst_model(inp,rnp,est)
 %   rnp  - handle to run parameters in CSTrunparams class instance
 %   est  - handle to estuary form properties in CSTformprops class instance  
 % OUTPUTS
-%   resX - along channel results in cell array as follows
+%   res is a struct comprising X, F and XT
+%   res.X - along channel results in cell array as follows
 %       mean water suface elevation along estuary (zwx+zw0)
 %       elevation amplitude along estuary (ax)
 %       tidal velocity amplitude along estuary (Ux)        
 %       river flow velocity along estuary (urx)
+%
+%       if rnp.isfull is true the following additional properties are added
+%       estimate of Stokes drift over tidal cycle (usx)
+%       phase angle between elevation and velocity (eA)
+%       intertidal slope (1:m) (msx)
+%       effective hydrualic CSA (this is A_Qf above)    
+%
+%   res.F - along channel form results in cell array as follows
+%       CSA at mtl (Ax)
 %       hydraulic depth at mtl (h_Qf)
-%   xdim - along channel distances 
-%   resXT - results for variables that are a function of x and t
+%       width at high water
+%       width at low water
+%       Manning's N (Ks)
+%
+%   res.XT - results for variables that are a function of x and t
 %       tidal elevation over a tidal cycle (ht)
 %       tidal velocity over tidal cycle (utt)
 %       river velocity scaled for tidal elevation (urt)
 %       Stokes drift velocity as a function of x and t (ust)
-%   time - model time in 
+%
+%   xdim - along channel distances 
+%   time - model time in seconds
 % NOTES
 %   Cai, H., H. H. G. Savenije, and M. Toffolon, 2012, 
 %   A new analytical framework for assessing the effect of sea-level rise and dredging on tidal damping in estuaries, 
@@ -45,7 +60,7 @@ function [resX,xdim,resXT,time] = cst_model(inp,rnp,est)
 % modified for use in ModelUI by Ian Townend
 %--------------------------------------------------------------------------
 %
-    time = {}; xdim = {}; resXT = {}; resX = {};
+    time = {}; xdim = {}; res = [];
     ok = matlab.addons.isAddonEnabled('Optimization Toolbox'); %requires v2017b
     if ok<1
         warndlg('Matlab ''Optimization Toolbox'' required to run the CSTmodel')
@@ -86,17 +101,12 @@ function [resX,xdim,resXT,time] = cst_model(inp,rnp,est)
     
     %initialise estuary form properties
     if rnp.useObs && ~isempty(est)
-        dst = est.AlongChannelForm;                     %table of observed/loaded form data
-        if any(strcmp(dst.VariableNames,'Hmtl')) && ... %not defined in file - loaded as NaN
-                                (sum(dst.Hmtl)>0 || all(isnan(dst.Hmtl))) 
-            Wmtl = dst.Amtl./dst.Hmtl;                  %user defined
-        else
-            Wmtl = dst.Wlw+(dst.Whw-dst.Wlw)/2.57;      %assume F&A ideal profile
-        end
+        dst = est.Data.AlongChannelForm;      %table of observed/loaded form data
+        Wmtl = est.Wmtl;                      %use class dependent property
         Ximp = dst.Dimensions.X;
         A = fitChannelVar(Ximp,dst.Amtl,x,Ao,Ar);
         B = fitChannelVar(Ximp,Wmtl,x,Bo,Br); %width at mean tide level
-        rs = fitChannelVar(Ximp,dst.Whw./dst.Wlw,x,dst.Whw(1)./dst.Wlw(1),1);%storage ratio
+        rs = fitChannelVar(Ximp,est.Wratio,x,est.Wratio(1),1);%storage ratio
         if all(isnan(dst.N))                  %not defined in file - loaded as NaN
             Ks = interpChannelVar(kM,xsw,Le,x);
             if isempty(Ks), return; end
@@ -301,7 +311,6 @@ end
     Ux = v_Qf;
     kx = 2*pi()./(c*T);
     eA = epsilon_Qf;
-    % %              Not Currently Used in CST or ChannelForm models
 
     ht(:,:) = diag(ax)*cos(w*ti-diag(kx)*xi);
     utt(:,:) = -diag(Ux)*sin(w*ti-diag(kx)*xi-diag(eA)*ones(size(ht)));
@@ -314,7 +323,7 @@ end
 
     I = ones(size(ht));
     At = diag(A')*I+ht.*(diag(B)*I+diag(msx)*ht); %area over tidal cycle
-    urt = diag(urx.*A')*I./At;   %river velocity scaled for tidal elevation
+    urt = diag(urx.*A')*I./At;   %river velocity scaled for variation in tidal elevation
     ust = utt.^2./(diag(c)*I);   %Stokes drift velocity as a function of x and t
     usx = Ux.^2/2./c0;           %estimate of the tidal_av Stoke's drift velocity
 
@@ -331,27 +340,35 @@ end
     %Results in format for ModelUI (function of X only)
     xdim{1} = x;
     time{1} = t;
-    % 
-    resX{1} = zwx'+zw0;   %mean water suface elevation along estuary
-    resX{2} = ax';        %elevation amplitude along estuary
-    resX{3} = Ux';        %tidal velocity amplitude along estuary            
-    resX{4} = urx;        %river flow velocity along estuary
-    resX{5} = h_Qf';      %hydraulic depth at mtl (m)   
-    %
-    resXT{1} = ht';       %tidal elevation over a tidal cycle
-    resXT{2} = utt';      %tidal velocity over tidal cycle
-    resXT{3} = urt';      %river velocity scaled for tidal elevation
-    resXT{4} = ust';      %Stokes drift velocity as a function of x and t
+    %tidal cycle properties
+    res.XT{1} = ht';       %tidal elevation over tidal cycle rel.to mtl
+    res.XT{2} = utt';      %tidal velocity over tidal cycle
+    res.XT{3} = urt';      %river velocity scaled for variation in tidal elevation
+    res.XT{4} = ust';      %Stokes drift velocity as a function of x and t
 
+    %along channel hydraulic properties
+    res.X{1} = zwx'+zw0;   %mean water suface elevation along estuary
+    res.X{2} = ax';        %elevation amplitude along estuary
+    res.X{3} = ones(size(ax')); %LW/HW amplitude ratio 
+    res.X{4} = Ux';        %tidal velocity amplitude along estuary            
+    res.X{5} = urx;        %river flow velocity along estuary
+    
     if rnp.isfull
         %variables in x
-        resX{6} = eA';    %phase angle between elevation and velocity       
-        resX{7} = Ax;     %cross-sectional area at mtl (m^2)
-        resX{8} = B;      %width at mtl (m)
-        resX{9} = msx;    %intertidal slope (1:m)
-        resX{10} = A';    %effective hydrualic CSA (this is A_Qf above)
-        resX{11} = usx';  %estimate of Stokes drift over tidal cycle 
+        res.X{6} = usx';   %estimate of Stokes drift over tidal cycle 
+        res.X{7} = eA';    %phase angle between elevation and velocity   
+        res.X{8} = msx;    %intertidal slope (1:m)
+        res.X{9} = A';     %effective hydrualic CSA (this is A_Qf above)
     end
+
+    %along channel form properties
+    res.F{1} = Ax;            %cross-sectional area at mtl (m^2)
+    res.F{2} = h_Qf';         %hydraulic depth at mtl (m) 
+    %adjust mean tide level based on slope and tidal amplitude
+    res.F{3} = B+2*ax'.*msx; %width at high water (m)    
+    res.F{4} = B-2*ax'.*msx; %width at low water (m)    
+    res.F{5} = Ks;           %Mannings N (-)
+
 end
 %%
 function outVar = interpChannelVar(inVar,xsw,Le,x)

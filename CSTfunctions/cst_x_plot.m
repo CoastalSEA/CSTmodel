@@ -1,4 +1,4 @@
-function cst_x_plot(obj,ax)
+function cst_x_plot(obj,ax,range)
 %
 %-------header-------------------------------------------------------------
 % NAME
@@ -6,10 +6,11 @@ function cst_x_plot(obj,ax)
 % PURPOSE
 %   plot along channel variations on a tab or figure
 % USAGE
-%   cst_x_plot(obj,ax)
+%   cst_x_plot(obj,ax,range)
 % INPUTS
 %   obj - class handle for CSTrunmodel or CSTdataimport
 %   ax - axes handle for Figure or Tab
+%   range - lower and upper range of x-axis
 % OUTPUTS
 %   along-channel graphic showing water levels and velocities
 % NOTES 
@@ -21,20 +22,38 @@ function cst_x_plot(obj,ax)
 % CoastalSEA (c) Feb 2024
 %-------------------------------------------------------------------------
 %
-    dst = getHydroData(obj);
-    x = dst.Dimensions.X; 
-    z = dst.MeanTideLevel;  %mean tide level
-    a = dst.TidalElevAmp;   %tidal amplitude
-	U = dst.TidalVelAmp;    %tidal velocity amplitude
-	v = dst.RiverVel;       %river velocity 
-	d = dst.HydDepth;       %hydraulic depth
+    dsthyd = obj.Data.AlongChannelHydro;
+    dstform = obj.Data.AlongChannelForm;
+
+    x = dsthyd.Dimensions.X; 
+    z = dsthyd.MeanTideLevel;  %mean tide level
+    a = dsthyd.TidalElevAmp;   %tidal amplitude
+    r = dsthyd.LWHWratio;      %LW/HW ratio
+	U = dsthyd.TidalVelAmp;    %tidal velocity amplitude
+	v = dsthyd.RiverVel;       %river velocity 
+	d = dstform.Hmtl;          %hydraulic depth
+
+    if nargin>2
+        idxmin = find(x<=range{1},1,'last');  
+        idxmax = find(x>=range{2},1,'first');
+        x = x(idxmin:idxmax);
+        z = z(idxmin:idxmax);
+        a = a(idxmin:idxmax);
+        U = U(idxmin:idxmax);
+        v = v(idxmin:idxmax);
+        d= d(idxmin:idxmax);
+    end
+    
+    hwl = 2*a./(1+r);          %adjust amplitude for asymmetry in LW/HW
+    lwl = r.*hwl;
+
     %gerenate plot
     yyaxis left
-    plot(x,z,'-r','DisplayName','MTL'); %plot time v elevation
+    plot(x,z,'-r','DisplayName','Mean tide level');        %plot time v elevation
     hold on
-    plot(x,(z+a),'-.b','DisplayName','HWL')%plot high water level
-    plot(x,(z-a),'-.b','DisplayName','LWL')%plot low water level
-	plot(x,(z-d),'-k','DisplayName','Hydraulic depth')%hydraulic depth below mean tide level
+    plot(x,(z+hwl),'-.b','DisplayName','High water level') %plot high water level
+    plot(x,(z-lwl),'-.b','DisplayName','Low water level')  %plot low water level
+	plot(x,(z-d),'-k','DisplayName','Hyd. depth to mtl')   %hydraulic depth below mean tide level
     ylabel('Elevation (mOD)'); 
 	yyaxis right
 	plot(x,U,'--','Color',mcolor('orange'),'DisplayName','Tidal velocity')%plot tidal velocity
@@ -44,19 +63,6 @@ function cst_x_plot(obj,ax)
     ylabel('Velocity (m/s)'); 
 	legend('Location','best');			
     title ('Along channel variation');
-    subtitle(sprintf('Case: %s',dst.Description));
+    subtitle(sprintf('Case: %s',dsthyd.Description));
     ax.Color = [0.96,0.96,0.96];  %needs to be set after plo
-end
-%%
-function dst = getHydroData(obj)
-    %extract data from source depending on class type
-    if isa(obj,'CSTrunmodel')
-        dst = obj.Data.AlongChannelHydro;
-    elseif isa(obj,'CSTdataimport')
-        Hmtl = obj.Data.AlongChannelForm.Hmtl;
-        dst1 = obj.Data.AlongChannelHydro;
-        dst = addvars(dst1,Hmtl,'NewVariableNames','HydDepth');
-    else
-        warndlg('Class not recognised')
-    end
 end

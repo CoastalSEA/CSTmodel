@@ -22,7 +22,7 @@ function cstmodel_update(obj,oldV,newV)
 % CoastalSEA (c) Feb 2024 
 %--------------------------------------------------------------------------
 %
-    if strcmp(oldV,'2.0') && strcmp(newV,'2.1')
+    if strcmp(oldV,'2.0') && (strcmp(newV,'2.1') || strcmp(newV,'2.2') )
         update_v20_to_v21(obj);   
     else
         warndlg(sprintf('No update for version %s to version %s', oldV,newV))

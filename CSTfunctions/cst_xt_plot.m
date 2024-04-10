@@ -119,9 +119,9 @@ function setPlot(~,ax,xax,pin,plabels)
         ylabel(plabels.y1)
     end
 
-    if isfield(pin,'Velocity')
+    if isfield(pin,'TidalVel')
         yyaxis right
-	    plot(ax,xax,pin.Velocity,'--','Color',mcolor('orange'),'DisplayName','Tidal velocity','Tag','Velocity')%plot tidal velocity
+	    plot(ax,xax,pin.TidalVel,'--','Color',mcolor('orange'),'DisplayName','Tidal velocity','Tag','TidalVel')%plot tidal velocity
         if isfield(pin,'RiverVel')
 	        hold on
             plot(ax,xax,pin.RiverVel,'--','Color',mcolor('green'),'DisplayName','River velocity','Tag','RiverVel') %plot river velocity
@@ -144,7 +144,7 @@ function setYaxisLimits(obj,ax,dst)
         setHaxisLimits(obj,ax,dst)
     end
     %
-    if matches('Velocity',dst.VariableNames)
+    if matches('TidalVel',dst.VariableNames)
         setUaxisLimits(obj,ax,dst)
     end
 end 

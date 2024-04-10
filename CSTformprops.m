@@ -20,7 +20,13 @@ classdef CSTformprops < handle
 %--------------------------------------------------------------------------
 %    
     properties  
-        AlongChannelForm        
+        Data    %struct to hold AlongChannelForm dstable        
+    end
+
+    properties (Dependent)
+        Wmtl    %width at mean tide level (Amtl/Hmtl)
+        Wratio  %intertidal storage ratio (Whw/Wlw)
+        Wint    %intertidal width (Whw-Wlw)
     end
 
     methods 
@@ -33,19 +39,21 @@ classdef CSTformprops < handle
         function dst = loadData(mobj,isext)
             %read and load a data set from a file
             if nargin<2
-                isext = false; %true - use class to initialise table but don't save instance
+                isext = false; %if true - use class to initialise table but don't save instance
             end
             obj = CSTformprops;                      
             [data,~,filename] = readInputData(obj);             
-            if isempty(data), return; end
+            if isempty(data), dst = []; return; end
 
             %code to parse input data and assign to vardata
+            isflip = false;
             x = data{1}';
             dataX = data(2:end);
             dataX = cellfun(@transpose,dataX,'UniformOutput',false);
             if x(1)>x(end)
                 x = fliplr(x);
                 dataX = cellfun(@fliplr,dataX,'UniformOutput',false);
+                isflip = true;
             end
 
             %initialise dsproperties for data
@@ -54,23 +62,54 @@ classdef CSTformprops < handle
             %load the results into a dstable  
             dst = dstable(dataX{:},'DSproperties',dsp); 
             dst.Dimensions.X = x;
+            if isempty(dst.DataTable.Properties.CustomProperties.Dimensions.X)
+                dst = []; return;
+            end
+
             %assign metadata about data
-            dst.Source{1} = filename;
-            if isext
+            dst.MetaData = isflip; %flag to indicate if data was reversed from source
+            dst.Source = filename;  %char not cell because multiple tables
+            if isext                %true if called  by data import class
                 delete(obj);
             else
-                obj.AlongChannelForm = dst;
-                %setDataRecord classobj, muiCatalogue obj, dataset, classtype
+                obj.Data.AlongChannelForm = dst; %mirrors struct used by CSTdataimport
+                %assign CSTformprops instance to the model Inputs struct
                 setClassObj(mobj,'Inputs','CSTformprops',obj); 
             end
         end 
     end   
 %%
     methods
+        function Wmtl = get.Wmtl(obj)
+            %width at mean tide level as Area/Hydraulic depth if hydraulic
+            %depth is not all nans
+            dst = obj.Data.AlongChannelForm;
+            if sum(dst.Hmtl,'omitnan')>0        %Hmtl values have been loaded  
+                Wmtl = dst.Amtl./dst.Hmtl;
+            else
+                Wmtl = dst.Wlw+(dst.Whw-dst.Wlw)/2.57;      %assume F&A ideal profile
+            end
+        end
+
+%%
+        function Wratio = get.Wratio(obj)
+            %intertidal storage ratio
+            dst = obj.Data.AlongChannelForm;
+            Wratio = dst.Whw./dst.Wlw;
+        end
+        
+%%
+        function Wint = get.Wint(obj)
+            %intertidal storage ratio
+            dst = obj.Data.AlongChannelForm;
+            Wint = dst.Whw-dst.Wlw;
+        end
+
+%%
         function tabPlot(obj,src,mobj)
             %redirect of cst_formplot which CSTdataimport also uses
             cst_formplot(obj,src,mobj);         
-        end     
+        end    
     end
 %%
     methods (Access = private)
@@ -100,7 +139,7 @@ classdef CSTformprops < handle
                                'Width at high water',...
                                'Width at low water',...                              
                                'Mannings N'},... %optional
-                'Unit',{'m/^2','m','m','m','-'},...
+                'Unit',{'m^2','m','m','m','-'},...
                 'Label',{'Area (m^2)','Depth (m)','Width (m)','Width (m)',...
                                                         'Mannings N'},...
                 'QCflag',repmat({'data'},1,5));  

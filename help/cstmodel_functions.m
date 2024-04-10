@@ -6,48 +6,57 @@
 %% Classes
 % Summary of the classes used by the CSTmodel
 %%
-% * *CSTdataimport*: import a data set, adding the results to dstable
-% and a record in a dscatlogue (as a property of muiCatalogue)
-% * *CSTformprops*: import and hold the width and area data used in the CSTmodel
+% * *CSTformprops*: import and hold the width and area data used in the
+%   CSTmodel.
 % * *CSTmodel*: main UI for CSTmodel interface, which implements the 
-%   muiModelUI abstract class to define main menus
-% * *CSTparameters*: input parameters to the CSTmodel
+%   muiModelUI abstract class to define main menus.
+% * *CSTparameters*: input parameters to the CSTmodel.
 % * *CSTrunmodel*: calculate the mean tide level and tidal amplitude along an estuary
-%   only works for a single channel (not a network)
-% * *CSTrunparams*: run parameters to the CSTmodel
-%
+%   Works for a single channel (not a network).
+% * *CSTrunparams*: run parameters to the CSTmodel.
+% * *CSTdataimport*: import a data set and decompose to be comparable to
+%   the CST model output.
 
 %% Functions
 % Summary of functions available in the _CSTfunctions_ folder.
 %%
 % * *cst_dataformat.m*
-% - functions to define metadata, read and load data from file for:
-% CST model data format
+% - functions to define metadata, read and load data from file.
 %
 % * *cst_model.m*
-% - calculate the mean tide level and tidal amplitude along an estuary
-% only works for a single channel (not a network)
+% - calculate the mean tide level and tidal amplitude along an estuary.
+% Works for a single channel (not a network).
 %
-% * *cst_x_plot.m* – plot along channel variations on a tab or figure
+% * *cst_decompose_velocity.m*
+% – decompose imported velocity into tidal, river and Stokes velocities and
+% compute additional parameters for comparison with CSTmodel output.
 %
-% * *cst_xt_plot.m* – plot variations in time or distance on a tab or figure
+% * *cst_phaselag.m*
+% – compute lag between elevation and velocity.
 %
-% * *cstmodel_update.m* –  update saved models to newer versions of CSTmodel
+% * *cst_x_plot.m* – plot along channel variations on a tab or figure.
+%
+% * *cst_xt_plot.m* – plot variations in time or distance on a tab or
+% figure.
+%
+% * *cstmodel_update.m* –  update saved models to newer versions of
+% CSTmodel.
 %
 % * *findzero_new_discharge_river.m*
-% - find y for given gamma and chi  with dominant river discharge
+% - find y for given gamma and chi  with dominant river discharge.
 %
 % * *findzero_new_discharge_tide.m*
-% - find y for given gamma and chi where tide is dominant
+% - find y for given gamma and chi where tide is dominant.
 %
 % * *f_new_2012.m*
-% - analyticl solution for tidal dynamics proposed by Cai et al. (2012)
+% - analyticl solution for tidal dynamics proposed by Cai et al. (2012).
 %
 % * *f_toffolon_2011.m*
-% - analyticl solution for tidal dynamics proposed by Toffolon and Savenije (2011)
+% - analyticl solution for tidal dynamics proposed by Toffolon and Savenije
+% (2011).
 %
 % * *newtonm.m*
-% - Newton-Raphson solution of the Jacobian
+% - Newton-Raphson solution of the Jacobian.
 %
 
 %% See Also

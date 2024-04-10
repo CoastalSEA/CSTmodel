@@ -39,46 +39,37 @@ end
 %--------------------------------------------------------------------------
 % getData
 %--------------------------------------------------------------------------
-function dst = getData(obj,filename) 
+function dst = getData(obj,x,isflip) 
     %read and load a data set from a file
-    [dataX,dataHT,dataUT,x,t]  = readInputData(filename);             
-    if isempty(dataX), dst = []; return; end
+    [dataHT,dataUT,t,meta]  = readInputData();             
+    if isempty(dataHT) && isempty(dataUT), dst = []; return; end
+    
 
-    dataX = cellfun(@transpose,dataX,'UniformOutput',false);
-    if x(1)>x(end)
-        x = fliplr(x);
-        dataX = cellfun(@fliplr,dataX,'UniformOutput',false);
+    if isflip %assumes that columns are ordered in the same sequence as the form data
         dataHT = fliplr(dataHT);
         dataUT = fliplr(dataUT);
     end
 
     %set metadata
-    [dsp1,dsp2] = setDSproperties;
+    dsp = setDSproperties;
     
-    %assign along channel data to struct
-    dst1 = dstable(dataX{:},'DSproperties',dsp1);
-    dst1.Dimensions.X = x;     %grid x-coordinate
-    dst1.MetaData = metaclass(obj).Name; %Any additional information to be saved';
-    dst.AlongChannelHydro = dst1;
-    
-    if ~isempty(dataHT) && ~isempty(dataUT)
-        input = {dataHT,dataUT};
-        dst2 = dstable(input{:},'RowNames',hours(t.h),'DSproperties',dsp2);
-        dst2.Dimensions.X = x;     %grid x-coordinate   
-        dst2.MetaData = metaclass(obj).Name; %Any additional information to be saved';    
-        dst.TidalCycleHydro = dst2; 
+    if ~isempty(dataHT) && all(size(dataHT)==size(dataUT))
+        datablank = zeros(size(dataHT)); %river and stokes velocities derived internally
+        input = {dataHT,dataUT,datablank,datablank};
+        dst1 = dstable(input{:},'RowNames',hours(t.h),'DSproperties',dsp);
+        dst1.Dimensions.X = x;     %grid x-coordinate
+        dst1.Source = meta;        %char not cell because multiple tables
+        dst1.MetaData = metaclass(obj).Name; %Any additional information to be saved';    
+        dst.TidalCycleHydro = dst1; 
+    else
+        warndlg('Dimensions of Elevation and Velocity data must be the same')
+        dst = [];
     end
 end
 %%
-function [dataX,dataHT,dataUT,x,t] = readInputData(filename)
+function [dataHT,dataUT,t,meta] = readInputData()
     %default is to load the along channel data (MSL,z-amp,u-amp,depth)    
-    dataSpec = '%f %f %f %f %f'; 
-    [data,~] = readinputfile(filename,1,dataSpec); %in dsfunctions
-    if isempty(data), return; end
-    x = data{1}';
-    dataX = data(2:end);
-    
-    dataHT = []; dataUT = []; t = [];
+    dataHT = []; dataUT = []; t = []; meta = [];
     %prompt to add the XT data for elevation     
     [fname,path,nfiles] = getfiles('MultiSelect','off',...
                 'FileType','*.txt;*.csv','PromptText','Select X-T Elevation file:');
@@ -88,6 +79,7 @@ function [dataX,dataHT,dataUT,x,t] = readInputData(filename)
         data = readmatrix(filename,'NumHeaderLines',1);
         t.h = data(:,1);
         dataHT = data(:,2:end);
+        meta = [filename,' & '];
     end
 
     %prompt to add the XT data for velocity
@@ -99,62 +91,36 @@ function [dataX,dataHT,dataUT,x,t] = readInputData(filename)
         data = readmatrix(filename,'NumHeaderLines',1);
         t.u = data(:,1);
         dataUT = data(:,2:end);
+        meta = sprintf('%s%s',meta,filename); 
     end
 end
 %%
 %--------------------------------------------------------------------------
 % dataDSproperties
 %--------------------------------------------------------------------------
-function [dsp1,dsp2] = setDSproperties(~) 
+function dsp = setDSproperties(~) 
     %define a dsproperties struct and add the model metadata
-    dsp1 = struct('Variables',[],'Row',[],'Dimensions',[]); 
-    dsp2 = dsp1; 
+    dsp = struct('Variables',[],'Row',[],'Dimensions',[]); 
     %define each variable to be included in the data table and any
     %information about the dimensions. dstable Row and Dimensions can
     %accept most data types but the values in each vector must be unique
 
-    %struct entries are cell arrays and can be column or row vectors
-    %static ouput (mean tide values)
-    dsp1.Variables = struct(...                       
-        'Name',{'MeanTideLevel','TidalElevAmp','TidalVelAmp',...
-                                            'RiverVel'},...
-        'Description',{'Mean water level',...
-                    'Tidal elevation amplitude',...
-                    'Tidal velocity amplitude',...
-                    'River flow velocity'},...
-        'Unit',{'m','m','m/s','m/s'},...
-        'Label',{'Mean water level (m)',...
-                 'Elevation (m)',...
-                 'Velocity (m/s)',...
+    %tidal cycle values
+    dsp.Variables = struct(...                       
+        'Name',{'Elevation','TidalVel','RiverVel','StokesVel'},...
+        'Description',{'Elevation','Tidal velocity',...
+                       'River velocity','Stokes drift velocity'},...
+        'Unit',{'m','m/s','m/s','m/s'},...
+        'Label',{'Elevation (m)','Velocity (m/s)','Velocity (m/s)',...
                  'Velocity (m/s)'},...
-        'QCflag',repmat({'model'},1,4)); 
-    dsp1.Row = struct(...
-        'Name',{''},...
-        'Description',{''},...
-        'Unit',{''},...
-        'Label',{''},...
-        'Format',{''});        
-    dsp1.Dimensions = struct(...    
-        'Name',{'X'},...
-        'Description',{'Chainage'},...
-        'Unit',{'m'},...
-        'Label',{'Distance from mouth (m)'},...
-        'Format',{'-'});  
-
-    %dynamic values
-    dsp2.Variables = struct(...                       
-        'Name',{'Elevation','Velocity'},...
-        'Description',{'Elevation','Tidal velocity'},...
-        'Unit',{'m','m/s'},...
-        'Label',{'Elevation (m)','Velocity (m/s)'},...
-        'QCflag',{'data','data'}); 
-    dsp2.Row = struct(...
+        'QCflag',{'data','data','deived','derived'}); 
+    dsp.Row = struct(...
         'Name',{'Time'},...
         'Description',{'Time'},...
         'Unit',{'h'},...
         'Label',{'Time (h)'},...
         'Format',{'h'});         
-    dsp2.Dimensions = struct(...    
+    dsp.Dimensions = struct(...    
         'Name',{'X'},...
         'Description',{'Chainage'},...
         'Unit',{'m'},...

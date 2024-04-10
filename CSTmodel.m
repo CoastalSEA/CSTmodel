@@ -15,8 +15,8 @@ classdef CSTmodel < muiModelUI
 % 
     properties  (Access = protected)
         %implement properties defined as Abstract in muiModelUI
-        vNumber = '2.1'
-        vDate   = 'Jan 2024'
+        vNumber = '2.2'
+        vDate   = 'May 2024'
         modelName = 'CSTmodel'                     
         %Properties defined in muiModelUI that need to be defined in setGui
         % ModelInputs  %classes required by model: used in isValidModel check 
@@ -101,16 +101,11 @@ classdef CSTmodel < muiModelUI
             
             %% Setup menu -------------------------------------------------
             menu.Setup(1).List = {'Model Parameters','Run Parameters',...
-                     'Estuary Properties','Import Data','Model Constants'};                                    
-            menu.Setup(1).Callback = [repmat({@obj.setupMenuOptions},[1,3]),...
-                                          {'gcbo;'},{@obj.setupMenuOptions}];
+                     'Estuary Properties','Import Data','User Data','Model Constants'};                                    
+            menu.Setup(1).Callback = [repmat({@obj.setupMenuOptions},[1,5]),...
+                                          {@obj.setupMenuOptions}];
             %add separators to menu list (optional - default is off)
-            menu.Setup(1).Separator = {'off','off','off','on','on'}; %separator preceeds item
-            
-            % submenu for Import Data (if these are changed need to edit
-            % loadMenuOptions to be match)
-            menu.Setup(2).List = {'Load','Add','Delete','Quality Control'};
-            menu.Setup(2).Callback = repmat({@obj.loadMenuOptions},[1,4]);
+            menu.Setup(1).Separator = {'off','off','off','on','off','on'}; %separator preceeds item
             
             %% Run menu ---------------------------------------------------
             menu.Run(1).List = {'Run Model','Derive Output'};
@@ -187,9 +182,9 @@ classdef CSTmodel < muiModelUI
                 %select from data import
                 cobj = userSelection(obj,dobj);
             elseif ~isempty(cobj) && ~isempty(dobj)
-                answer = questdlg('Use Estuary properties or Data import?',...
-                              'Form plot','Properties','Import','Properties');
-                if strcmp(answer,'Import')
+                answer = questdlg('Use estuary Form Properties or Imported Dataset?',...
+                          'Form plot','Form Properties','Imported Data','Imported Data');
+                if strcmp(answer,'Imported Data')
                     cobj = userSelection(obj,dobj);
                 end
             end
@@ -224,18 +219,10 @@ classdef CSTmodel < muiModelUI
                     %update tab display with input data
                     tabsrc = findobj(obj.mUI.Tabs,'Tag','Inputs');
                     InputTabSummary(obj,tabsrc);
-                case 'Model Constants'
-                    obj.Constants = editProperties(obj.Constants);
-            end
-        end  
-%%
-        function loadMenuOptions(obj,src,~)
-            %callback functions to import data
-            classname = 'CSTdataimport';
-            switch src.Text
-                case 'Load'
+                case 'Import Data'
                     %relace callStaticFunction because need mobj as well as
                     %muicat in CSTdataimport
+                    classname = 'CSTdataimport';
                     fncname = sprintf('%s.loadData',classname);
                     heq = str2func(['@(mcat,cname) ',[fncname,'(mcat,cname)']]); 
                     try
@@ -244,16 +231,15 @@ classdef CSTmodel < muiModelUI
                         msg = sprintf('Unable to run function %s\nID: ',fncname);
                         disp([msg, ME.identifier])
                         rethrow(ME)                     
-                    end
-                case 'Add'
-                    useCase(obj.Cases,'single',{classname},'addData');
-                case 'Delete'
-                    useCase(obj.Cases,'single',{classname},'deleteData');
-                case 'Quality Control'
-                    useCase(obj.Cases,'single',{classname},'qcData');
+                    end     
+                case 'User Data'
+                    classname = 'muiUserData';
+                    fname = sprintf('%s.loadData',classname);
+                    callStaticFunction(obj,classname,fname); 
+                case 'Model Constants'
+                    obj.Constants = editProperties(obj.Constants);
             end
-            DrawMap(obj);
-        end   
+        end  
 
         %% Run menu -------------------------------------------------------
         function runMenuOptions(obj,src,~)
@@ -308,16 +294,17 @@ classdef CSTmodel < muiModelUI
             else
                 isok = true;
             end
-        end    
+        end  
+    end
 
-        %%user form data tabPlot selection---------------------------------
+%% user form data tabPlot selection----------------------------------------
+    methods
         function cobj = userSelection(obj,dobj)
             %prompt user to select from the available data import cases
-            if length(dobj)==1, cobj = dobj.Data; return; end
+            if length(dobj)==1, cobj = dobj; return; end
             %select from data import
             promptxt = 'Select case to use:';
-            [lobj,~] = selectCaseObj(obj.Cases,[],{'CSTdataimport'},promptxt);
-            cobj = lobj.Data;
+            [cobj,~] = selectCaseObj(obj.Cases,[],{'CSTdataimport'},promptxt);
         end
     end
 end    

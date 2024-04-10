@@ -23,12 +23,12 @@
 % * *CSTparameters* - defines the model input parameters.
 % * *CSTrunparams* - defines the model run time parameters.
 % * *CSTformprops* - load estuary form properties from file and display on
-% the Form tab
-% * *CSTrunmodel* - Handle the running of the model, saving of results and 
-% display on the X-Plot and XT-Plot tabs.
+% the Form tab.
+% * *CSTrunmodel* - run the model and save the results.
+% * *CSTdataimport* - import a data set.
 
 %% CSTmodel functions
-% *cst_model* - model code modified from source provided by Huayang Cai
+% For details of model functions used see <matlab:doc('cstmodel_functions') CSTmodel classes and functions> or CSTmodel Manual.
 
 %% Manual
 % The <matlab:cst_open_manual manual> provides further details of setup and 

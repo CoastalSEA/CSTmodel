@@ -30,8 +30,8 @@ function cst_formplot(obj,src,mobj)
     s1 = subplot(3,1,1,ax);
     s2 = subplot(3,1,2);
     s3 = subplot(3,1,3);
-
-    dst = obj.AlongChannelForm; 
+    
+    dst = obj.Data.AlongChannelForm; 
     if ~isempty(dst)            
         %plot observed data from CSTformparams
         if ~isprop(dst,'Amtl')
@@ -102,7 +102,7 @@ function cst_formplot(obj,src,mobj)
         sgtitle('Modelled Estuary Form Properties','FontSize',10);
     else
         sgtitle(sprintf('Estuary Form Properties\nFile: %s',...
-                dst.Source{1}),'Interpreter','none','FontSize',8); 
+                dst.Source),'Interpreter','none','FontSize',8); 
     end           
 
 end

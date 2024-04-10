@@ -50,18 +50,24 @@
 % <html>
 % <table border=1><u>Along-channel Properties file format</u>: 1 line for header and 5
 % columns of data as follows:<br>
-% <ul>dist - along channel distance,<br>
-%       msl - mean water level,<br>
-%       z-amp - tidal amplitude,<br>
-%       u-amp - velocity amplitude,<br>	
-%       hyd-depth - hydraulic depth</ul>
+% <ul>  x - Distance from mouth,<br>
+% Amtl - Area at mean tide level,<br>
+% Whw - Width at high water,<br>
+% Wlw - Width at low water,<br>
+% Manning_N - Mannings N (optional)</ul> 
 % </table>
 % <table border=1><u>Elevation and Velocity file format</u>: 
 % 1 line for header, 1 column for time 
 % and N columns for elevation or velocity at each time interval, where
 % N is the number of distances included in the along channel properties file.
+% Elevations are water levels to a local datum and velocites are total
+% velocities.
 % </table>
 % </html>
+
+%%
+% * *User Data*: option for user to define own data import
+
 %%
 % * *Model Constants*: a number of constants are used in the model. Generally, the default values are appropriate but these can be adjusted and saved with the project if required.
 
