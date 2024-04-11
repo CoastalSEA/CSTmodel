@@ -112,7 +112,7 @@ function  dst = cst_decompose_velocity(dst)
         [phase(j),pkph(j)] = cst_phaselag(zxt(:,j),utt(:,j),t,isp);   %phase lag (s)
     end
     eAx = phase/T*2*pi(); %ratio of csa convergence length to tidal wavelength (La/lambda)
-    figure('Tag','PlotFig'); plot(x,phase/T,x,pkph/T);
+    % figure('Tag','PlotFig'); plot(x,phase/T,x,pkph/T);
 
     dataX = {mtlx,ampx,LwHw,Ux,urx,usx,eAx,msx,Aeff};
 

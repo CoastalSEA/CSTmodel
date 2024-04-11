@@ -134,7 +134,7 @@ classdef CSTrunmodel < muiDataSet
         function estobj =  getObservedForm(obj,mobj)
             %
             estobj = getClassObj(mobj,'Inputs','CSTformprops');  %can be empty
-            if ~isempty(estobj)
+            if ~isempty(estobj) && ~isempty(estobj.Data)
                 activatedynamicprops(estobj.Data.AlongChannelForm); %ensures variables are active
             end
             impobj = getClassObj(mobj,'Cases','CSTdataimport');  %can be empty
