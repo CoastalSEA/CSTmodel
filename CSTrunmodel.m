@@ -20,6 +20,12 @@ classdef CSTrunmodel < muiDataSet
         %inherits Data, RunParam, MetaData and CaseIndex from muiDataSet
         %Additional properties:     
     end
+
+    properties (Dependent)
+        Wmtl    %width at mean tide level (Amtl/Hmtl)
+        Wratio  %intertidal storage ratio (Whw/Wlw)
+        Wint    %intertidal width (Whw-Wlw)
+    end   
     
     properties (Transient)
         ModelMovie
@@ -127,7 +133,33 @@ classdef CSTrunmodel < muiDataSet
                     cst_xt_plot(obj,src);
             end            
         end
-    end 
+
+%%
+        function Wmtl = get.Wmtl(obj)
+            %width at mean tide level as Area/Hydraulic depth if hydraulic
+            %depth is not all nans
+            dst = obj.Data.AlongChannelForm;
+            if sum(dst.Hmtl,'omitnan')>0        %Hmtl values have been loaded  
+                Wmtl = dst.Amtl./dst.Hmtl;
+            else
+                Wmtl = dst.Wlw+(dst.Whw-dst.Wlw)/2.57;      %assume F&A ideal profile
+            end
+        end
+
+%%
+        function Wratio = get.Wratio(obj)
+            %intertidal storage ratio
+            dst = obj.Data.AlongChannelForm;
+            Wratio = dst.Whw./dst.Wlw;
+        end
+
+%%
+        function Wint = get.Wint(obj)
+            %intertidal storage ratio
+            dst = obj.Data.AlongChannelForm;
+            Wint = dst.Whw-dst.Wlw;
+        end
+    end
     
 %%    
     methods (Access = private)
