@@ -24,7 +24,7 @@ function  dst = cst_decompose_velocity(dst)
 %
     g = 9.81;                           %acceleration due gravity
     %get additional input data
-    promptxt = sprintf('Define values use to extract\ntidal, river and Stokes velotities.\n\n:River discharge at head (m^3/s)');
+    promptxt = sprintf('Define values use to extract\ntidal, river and Stokes velotities.\n\nRiver discharge at head (m^3/s):');
     promptxt = {promptxt,'Use Actual or Effective CSA (0/1):'};
     answer = inputdlg(promptxt,'Import data',1,{'35000','1'});
     if isempty(answer), return; end    
@@ -60,8 +60,8 @@ function  dst = cst_decompose_velocity(dst)
     %decompose velocity into tidal, river and Stokes components -----------   
     I = ones(size(zxt));
     if iseff
-        %code to adjust urt based on effective hydraulic CSA
-        urx = trapz(delt,uxt,1)/(T);  %intial estimate of river flow based on residual of total velocity   
+        %code to adjust urt based on effective hydraulic CSA (see manual)
+        urx = trapz(delt/T,uxt,1);  %intial estimate of river flow based on residual of total velocity   
         % umean = mean(uxt,1);
         % figure; plot(x,urx,x,umean);
         Aeff = Amx;
@@ -70,6 +70,9 @@ function  dst = cst_decompose_velocity(dst)
         % figure('Tag','PlotFig'); plot(Amx,Aeff,'o');
         %effective hydraulic CSA over tidal cycle
         A =I*diag(Aeff)+zxt.*(I*diag(Wmx)+zxt*diag(msx));
+        %integrate tidal mean and rescale CSA to restore tidal mean CSA
+        Aeft = trapz(delt/T,A,1);
+        A = (I*diag(Aeft./Aeff)).*A;
     else
         %use observed values of csa at mtl to define variation in CSA
         Aeff = Amx;

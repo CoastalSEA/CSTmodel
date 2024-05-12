@@ -39,6 +39,7 @@ function cst_x_plot(obj,ax,range)
         x = x(idxmin:idxmax);
         z = z(idxmin:idxmax);
         a = a(idxmin:idxmax);
+        r = r(idxmin:idxmax);
         U = U(idxmin:idxmax);
         v = v(idxmin:idxmax);
         d= d(idxmin:idxmax);

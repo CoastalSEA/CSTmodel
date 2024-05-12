@@ -24,6 +24,11 @@
 % * *Cases > View settings*: user selects a Case to display a table listing the parameters used for the selected Case. 
 % * *Export/Import > Export*: user selects a Case class instance to export as a mat file.
 % * *Export/Import > Import*: user selects an exported Case class instance (mat file) to be loaded.
+%%
+% *NB*: to export the data from a Case for use in another application 
+% (eg text file, Excel, etc), use the *Project>Cases>Edit Data Set* option 
+% to make a selection and then use the ‘Copy to Clipboard’ button to paste 
+% the selection to the clipboard.
 
 %% Setup
 % * *Model Parameters*: dialogue to define model input parameters.
@@ -32,15 +37,15 @@
 % file.
 %%
 % <html>
-% <table border=1><u>Estuary Properties file format</u>: 1 line for header and 5
+% <table border=1>
+% <ul><u>Estuary Properties file format</u>: 1 line for header and 5
 % columns of data as follows:<br>
-% <ul>  x - Distance from mouth,<br>
+% x - Distance from mouth,<br>
 % Amtl - Area at mean tide level,<br>
 % Whw - Width at high water,<br>
 % Wlw - Width at low water,<br>
 % Manning_N - Mannings N (optional)</ul> 
-% </table>
-% </html>
+% </table></html>
 
 %%
 % * *Import Data*: dialogue to import observed or model data from a file. 
@@ -48,22 +53,22 @@
 % _Elevation_ and _Velocity_ over a tidal cycle.
 %%
 % <html>
-% <table border=1><u>Along-channel Properties file format</u>: 1 line for header and 5
+% <table border=1>
+% <ul><u>Along-channel Properties file format</u>: 1 line for header and 5
 % columns of data as follows:<br>
-% <ul>  x - Distance from mouth,<br>
+% x - Distance from mouth,<br>
 % Amtl - Area at mean tide level,<br>
 % Whw - Width at high water,<br>
 % Wlw - Width at low water,<br>
 % Manning_N - Mannings N (optional)</ul> 
 % </table>
-% <table border=1><u>Elevation and Velocity file format</u>: 
+% <table border=1>
+% <ul><u>Elevation and Velocity file format</u>: 
 % 1 line for header, 1 column for time 
 % and N columns for elevation or velocity at each time interval, where
 % N is the number of distances included in the along channel properties file.
 % Elevations are water levels to a local datum and velocites are total
-% velocities.
-% </table>
-% </html>
+% velocities.</ul></table></html>
 
 %%
 % * *User Data*: option for user to define own data import
@@ -77,7 +82,7 @@
 
 %% Analysis
 % * *Plots*: initialises the Plot UI to select variables and produce various types of plot. The user selects the Case, Dataset and Variable to used, along with the Plot type and any Scaling to be applied from a series of drop down lists, 
-% * *Statistics*: initialiss the Statistics UI to select data and run a range of standard statistical methods.
+% * *Statistics*: initialise the Statistics UI to select data and run a range of standard statistical methods.
 
 %% Help
 % * *Help>Documentation*: access the online documentation for CSTmodel.
