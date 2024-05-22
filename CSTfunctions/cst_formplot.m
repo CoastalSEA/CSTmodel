@@ -23,6 +23,8 @@ function cst_formplot(obj,src,mobj)
 % CoastalSEA (c) Feb 2024
 %-------------------------------------------------------------------------
 %
+    if isempty(obj.Data), return; end
+
     ht = findobj(src,'Type','axes');
     delete(ht);
     ax = axes('Parent',src,'Tag','Form');
