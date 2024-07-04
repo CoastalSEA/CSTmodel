@@ -15,7 +15,7 @@ classdef CSTmodel < muiModelUI
 % 
     properties  (Access = protected)
         %implement properties defined as Abstract in muiModelUI
-        vNumber = '2.2'
+        vNumber = '2.20'
         vDate   = 'May 2024'
         modelName = 'CSTmodel'                     
         %Properties defined in muiModelUI that need to be defined in setGui
