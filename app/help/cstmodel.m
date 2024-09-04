@@ -4,8 +4,7 @@
 % estuary 
 
 %% Licence
-% The code is provided as Open Source code (issued under a GNU General 
-% Public License).
+% The code is provided as Open Source code (issued under a BSD 3-clause License).
 
 %% Requirements
 % CSTmodel is written in Matlab(TM) and requires v2016b, or later. In addition, 

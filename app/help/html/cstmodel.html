@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>CSTmodel</title><meta name="generator" content="MATLAB 9.13"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2024-04-10"><meta name="DC.source" content="cstmodel.m"><style type="text/css">
+      --><title>CSTmodel</title><meta name="generator" content="MATLAB 9.13"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2024-09-04"><meta name="DC.source" content="cstmodel.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -67,7 +67,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h1>CSTmodel</h1><!--introduction--><p>Model to compute the mean tide level, high and low water levels, tidal velocity amplitude and river velocity along the length of a convergent estuary</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Licence</a></li><li><a href="#2">Requirements</a></li><li><a href="#3">Background</a></li><li><a href="#4">CSTmodel classes</a></li><li><a href="#5">CSTmodel functions</a></li><li><a href="#6">Manual</a></li><li><a href="#7">See Also</a></li></ul></div><h2 id="1">Licence</h2><p>The code is provided as Open Source code (issued under a GNU General Public License).</p><h2 id="2">Requirements</h2><p>CSTmodel is written in Matlab&#8482; and requires v2016b, or later. In addition, CSTmodel requires both the <a href="matlab:doc('dstoolbox')">dstoolbox</a> and the <a href="matlab:doc('muitoolbox')">muitoolbox</a></p><h2 id="3">Background</h2><p>The model computes the mean tide level, high and low water levels, tidal velocity amplitude and river velocity along the length of a convergent estuary using the analytical model of Cai, Savenije and Toffolon (hence the CST model) as described in (Savenije, 2005; Cai, 2014).</p><h2 id="4">CSTmodel classes</h2><div><ul><li><b>CSTmodel</b> - defines the behaviour of the main UI.</li><li><b>CSTparameters</b> - defines the model input parameters.</li><li><b>CSTrunparams</b> - defines the model run time parameters.</li><li><b>CSTformprops</b> - load estuary form properties from file and display on the Form tab.</li><li><b>CSTrunmodel</b> - run the model and save the results.</li><li><b>CSTdataimport</b> - import a data set.</li></ul></div><h2 id="5">CSTmodel functions</h2><p>For details of model functions used see <a href="matlab:doc('cstmodel_functions')">CSTmodel classes and functions</a> or CSTmodel Manual.</p><h2 id="6">Manual</h2><p>The <a href="matlab:cst_open_manual">manual</a> provides further details of setup and configuration of the model. Sample input files can be found in the example folder <a href="matlab:cst_example_folder">here</a>.</p><h2 id="7">See Also</h2><p><a href="matlab:doc('muitoolbox')">muitoolbox</a>, <a href="matlab:doc('dstoolbox')">dstoolbox</a>.</p><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2022b</a><br></p></div><!--
+  </style></head><body><div class="content"><h1>CSTmodel</h1><!--introduction--><p>Model to compute the mean tide level, high and low water levels, tidal velocity amplitude and river velocity along the length of a convergent estuary</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Licence</a></li><li><a href="#2">Requirements</a></li><li><a href="#3">Background</a></li><li><a href="#4">CSTmodel classes</a></li><li><a href="#5">CSTmodel functions</a></li><li><a href="#6">Manual</a></li><li><a href="#7">See Also</a></li></ul></div><h2 id="1">Licence</h2><p>The code is provided as Open Source code (issued under a BSD 3-clause License).</p><h2 id="2">Requirements</h2><p>CSTmodel is written in Matlab&#8482; and requires v2016b, or later. In addition, CSTmodel requires both the <a href="matlab:doc('dstoolbox')">dstoolbox</a> and the <a href="matlab:doc('muitoolbox')">muitoolbox</a></p><h2 id="3">Background</h2><p>The model computes the mean tide level, high and low water levels, tidal velocity amplitude and river velocity along the length of a convergent estuary using the analytical model of Cai, Savenije and Toffolon (hence the CST model) as described in (Savenije, 2005; Cai, 2014).</p><h2 id="4">CSTmodel classes</h2><div><ul><li><b>CSTmodel</b> - defines the behaviour of the main UI.</li><li><b>CSTparameters</b> - defines the model input parameters.</li><li><b>CSTrunparams</b> - defines the model run time parameters.</li><li><b>CSTformprops</b> - load estuary form properties from file and display on the Form tab.</li><li><b>CSTrunmodel</b> - run the model and save the results.</li><li><b>CSTdataimport</b> - import a data set.</li></ul></div><h2 id="5">CSTmodel functions</h2><p>For details of model functions used see <a href="matlab:doc('cstmodel_functions')">CSTmodel classes and functions</a> or CSTmodel Manual.</p><h2 id="6">Manual</h2><p>The <a href="matlab:cst_open_manual">manual</a> provides further details of setup and configuration of the model. Sample input files can be found in the example folder <a href="matlab:cst_example_folder">here</a>.</p><h2 id="7">See Also</h2><p><a href="matlab:doc('muitoolbox')">muitoolbox</a>, <a href="matlab:doc('dstoolbox')">dstoolbox</a>.</p><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2022b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
 %% CSTmodel
 % Model to compute the mean tide level, high and low water levels, tidal 
@@ -75,8 +75,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 % estuary 
 
 %% Licence
-% The code is provided as Open Source code (issued under a GNU General 
-% Public License).
+% The code is provided as Open Source code (issued under a BSD 3-clause License).
 
 %% Requirements
 % CSTmodel is written in Matlab(TM) and requires v2016b, or later. In addition, 
@@ -100,8 +99,6 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 %% CSTmodel functions
 % For details of model functions used see <matlab:doc('cstmodel_functions') CSTmodel classes and functions> or CSTmodel Manual.
-
-
 
 %% Manual
 % The <matlab:cst_open_manual manual> provides further details of setup and 
