@@ -302,7 +302,7 @@ classdef CSTmodel < muiModelUI
     methods
         function cobj = userSelection(obj,dobj)
             %prompt user to select from the available data import cases
-            if length(dobj)==1, cobj = dobj; return; end
+            if isscalar(dobj), cobj = dobj; return; end
             %select from data import
             promptxt = 'Select case to use:';
             [cobj,~] = selectCaseObj(obj.Cases,[],{'CSTdataimport'},promptxt);
