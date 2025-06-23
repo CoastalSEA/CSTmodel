@@ -39,24 +39,52 @@ end
 %--------------------------------------------------------------------------
 % getData
 %--------------------------------------------------------------------------
-function dst = getData(obj,x,isflip) 
+function dst = getData(obj,x,isflip,excelfile) 
     %read and load a data set from a file
-    [dataHT,dataUT,t,meta]  = readInputData();             
-    if isempty(dataHT) && isempty(dataUT), dst = []; return; end
+    dst = [];
+    if nargin<4
+        [data,xhu,thu,meta]  = readTextData();           
+    else
+        [data,xhu,thu,meta]  = readExcelData(excelfile);                  
+    end
+    if isempty(data), return; end
+    %check lengths of distance dimension for elevation and velocity
+     if isfield(xhu,'h') && length(xhu.h)~=length(x)
+         warndlg('No of elevation sections is not consistent with the number of sections in the form file')
+         return
+     end
+     
+     if isfield(xhu,'u') && length(xhu.u)~=length(x)
+            warndlg('No of velocity sections is not consistent with the number of sections in the form file')
+            return
+     end
     
+    %check lengths of time dimension for elevation and velocity
+    if isfield(thu,'h') && isfield(thu,'u') 
+        if length(thu.h)~=length(thu.u)
+            warndlg('No of elevation and velocity time intervals do not match')
+            return
+        else
+            t = thu.h;
+        end
+    elseif isfield(thu,'h')    
+        t = thu.h;
+    else
+        t = thu.u;
+    end
 
     if isflip %assumes that columns are ordered in the same sequence as the form data
-        dataHT = fliplr(dataHT);
-        dataUT = fliplr(dataUT);
+        data.HT = fliplr(data.HT);
+        data.UT = fliplr(data.UT);
     end
 
     %set metadata
     dsp = setDSproperties;
     
-    if ~isempty(dataHT) && all(size(dataHT)==size(dataUT))
-        datablank = zeros(size(dataHT)); %river and stokes velocities derived internally
-        input = {dataHT,dataUT,datablank,datablank};
-        dst1 = dstable(input{:},'RowNames',hours(t.h),'DSproperties',dsp);
+    if ~isempty(data.HT) && all(size(data.HT)==size(data.UT))
+        datablank = zeros(size(data.HT)); %river and stokes velocities derived internally
+        input = {data.HT,data.UT,datablank,datablank};
+        dst1 = dstable(input{:},'RowNames',hours(t),'DSproperties',dsp);
         dst1.Dimensions.X = x;     %grid x-coordinate
         dst1.Source = meta;        %char not cell because multiple tables
         dst1.MetaData = metaclass(obj).Name; %Any additional information to be saved';    
@@ -67,18 +95,28 @@ function dst = getData(obj,x,isflip)
     end
 end
 %%
-function [dataHT,dataUT,t,meta] = readInputData()
-    %default is to load the along channel data (MSL,z-amp,u-amp,depth)    
-    dataHT = []; dataUT = []; t = []; meta = [];
+function [data,x,t,meta] = readTextData()
+    %default is to load the along channel data     
+    data = []; x = []; t = []; meta = [];
     %prompt to add the XT data for elevation     
     [fname,path,nfiles] = getfiles('MultiSelect','off',...
                 'FileType','*.txt;*.csv','PromptText','Select X-T Elevation file:');
     if nfiles>0        
         filename = [path fname];    %single select returns char
         %read Elevation data file
-        data = readmatrix(filename,'NumHeaderLines',1);
-        t.h = data(:,1);
-        dataHT = data(:,2:end);
+        fid = fopen(filename, 'r');
+        if fid<0
+            errordlg('Could not open Elevation file for reading','File read error','modal')
+            return;
+        end
+        for i=1:2
+            header{i} = fgets(fid);  %#ok<AGROW>
+        end
+        indata = readmatrix(filename,'NumHeaderLines',2);
+        %t.h = data(:,1);
+        t.h = str2double(strsplit(strtrim(header{2})));
+        x.h = indata(:,1);
+        data.HT = indata(:,2:end)';
         meta = [filename,' & '];
     end
 
@@ -88,12 +126,52 @@ function [dataHT,dataUT,t,meta] = readInputData()
     if nfiles>0        
         filename = [path fname];    %single select returns char
         %read Velocity data file
-        data = readmatrix(filename,'NumHeaderLines',1);
-        t.u = data(:,1);
-        dataUT = data(:,2:end);
+        fid = fopen(filename, 'r');
+        if fid<0
+            errordlg('Could not open Velocity file for reading','File read error','modal')
+            return;
+        end
+        for i=1:2
+            header{i} = fgets(fid);  
+        end        
+        indata = readmatrix(filename,'NumHeaderLines',2);
+        t.u = str2double(strsplit(strtrim(header{2})));
+        x.u = indata(:,1);
+        data.UT = indata(:,2:end)';
         meta = sprintf('%s%s',meta,filename); 
     end
 end
+%%
+function [data,x,t,meta] = readExcelData(filename)
+    %default is to load the along channel data (MSL,z-amp,u-amp,depth)    
+    data = []; x = []; t = []; meta = [];
+    %read Elevation data file
+    cell_ids = {'B2';'B3';'A3'};
+    ptxt = 'Select Water Level Worksheet:';
+    indata = readspreadsheet(filename,false,cell_ids,ptxt); %return a table
+    if ~isempty(indata)
+        vars = cellfun(@(x) x(2:end),indata.Properties.VariableNames,'UniformOutput',false);
+        vars = replace(vars,'_','.');
+        t.h = str2double(vars);
+        x.h = str2double(indata.Properties.RowNames);
+        data.HT = indata{:,:}';
+        meta = [filename,' & '];
+    end
+
+    %read Velocity data file
+    cell_ids = {'B2';'B3';'A3'};
+    ptxt = 'Select Velocity Worksheet:';
+    indata = readspreadsheet(filename,false,cell_ids,ptxt); %return a table
+    if ~isempty(indata)
+        vars = cellfun(@(x) x(2:end),indata.Properties.VariableNames,'UniformOutput',false);
+        vars = replace(vars,'_','.');
+        t.u = str2double(vars);
+        x.u = str2double(indata.Properties.RowNames);
+        data.UT = indata{:,:}';
+        meta = sprintf('%s%s',meta,filename); 
+    end
+end
+
 %%
 %--------------------------------------------------------------------------
 % dataDSproperties

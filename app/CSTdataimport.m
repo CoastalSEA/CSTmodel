@@ -50,26 +50,31 @@ classdef CSTdataimport < muiDataSet
             %load user data set from one or more files
             obj = CSTdataimport();
             
-            msg1 = 'You will be prompted to load 4 files,in the following order:';
-            msg2 = 'in the following order:';
+            answer = questdlg('Excel or Text file','Import','Excel','Text','Excel');
+            if strcmp(answer,'Excel')
+                %load data from an Excel spreadsheet
+                msg1 = 'You will be prompted to load 3 worksheets,in the following order:';
+            else            
+                msg1 = 'You will be prompted to load 3 files,in the following order:';             
+            end
             msg3 = '1) Along-channel form data, Amtl, Whw, etc';
             msg4 = '2) X-T variation in water level';
             msg5 = '3) X-T variation in velocity';
             msg6 = 'Press Cancel if water level or velocity not available';
             msg7  = 'X & T intervals must be the same in all files';
-            msgtxt = sprintf('%s\n%s\n\n%s\n%s\n%s\n\n%s\n%s',msg1,msg2,...
-                                            msg3,msg4,msg5,msg6,msg7);
+            msgtxt = sprintf('%s\n\n%s\n%s\n%s\n\n%s\n%s',msg1,...
+                                msg3,msg4,msg5,msg6,msg7);
             hm = msgbox(msgtxt,'Load file');
-            waitfor(hm)
-
+            waitfor(hm)   
             FormData = CSTformprops.loadData(mobj,true);
             if isempty(FormData), return; end
+
             x = FormData.Dimensions.X;
             isflip = FormData.MetaData;
             
             %get data
             funcname = 'getData';
-            [dst,ok] = callFileFormatFcn(obj,funcname,obj,x,isflip);
+            [dst,ok] = callFileFormatFcn(obj,funcname,obj,x,isflip,FormData.Source);
             if ok<1 || isempty(dst), return; end
             dst.AlongChannelForm = FormData;  %add form data to dst
 

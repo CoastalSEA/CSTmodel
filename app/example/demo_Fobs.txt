@@ -1,4 +1,4 @@
-Humber 2000 measured: x  Amtl   Hmtl  Whw   Wlw   N(optional)				
+Humber 2000 measured: x  Amtl   Hmtl  Whw   Wlw   N(optional)
 0	    84244	13.59	16002	10478
 1499	92307	8.11	10568	6374
 4191	77368	7.22	11332	6426
@@ -31,6 +31,3 @@ Humber 2000 measured: x  Amtl   Hmtl  Whw   Wlw   N(optional)
 64244	1253	4.03	344	    264
 68526	1059	4.49	290	    210
 71524	917	    3.60	239 	174
-
-
-

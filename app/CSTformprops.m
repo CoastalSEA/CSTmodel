@@ -67,7 +67,7 @@ classdef CSTformprops < handle
             end
 
             %assign metadata about data
-            dst.MetaData = isflip; %flag to indicate if data was reversed from source
+            dst.MetaData = isflip;  %flag to indicate if data was reversed from source
             dst.Source = filename;  %char not cell because multiple tables
             if isext                %true if called  by data import class
                 delete(obj);
@@ -115,13 +115,23 @@ classdef CSTformprops < handle
     methods (Access = private)
         function [data,header,filename] = readInputData(~) 
             %read wind data (read format is file specific).
-            [fname,path,~] = getfiles('FileType','*.txt;*.csv',...
+            [fname,path,~] = getfiles('FileType','*.txt;*.csv;*.xlsx',...
                                 'PromptText','Select X-form data file:');
             if fname==0, data = []; header = []; filename = []; return; end
+            [~,~,ext] = fileparts(fname);
+            
             filename = [path fname];
-            dataSpec = '%f %f %f %f %f %f'; 
-            nhead = 1;     %number of header lines
-            [data,header] = readinputfile(filename,nhead,dataSpec);
+            if strcmp(ext,'.xlsx')                        %Excel file
+                cell_ids = {'A1';'A2';''};
+                ptxt = 'Select Properties Worksheet:';
+                data = readspreadsheet([path,fname],false,cell_ids, ptxt); %return a table
+                data = varfun(@(x) x, data, 'OutputFormat', 'cell');
+                header = 'Excel data';
+            else                                          %Text file
+                dataSpec = '%f %f %f %f %f %f'; 
+                nhead = 1;     %number of header lines
+                [data,header] = readinputfile(filename,nhead,dataSpec);
+            end
         end       
 %%        
         function dsp = setDSproperties(~)
